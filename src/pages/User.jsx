@@ -1,26 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { getAllUsers } from '../utils/localDB';
-import { UserTable } from '../component';
+import React from "react";
+import { UserTable } from "../component";
+import useFetch from "../hooks/useFetch";
 
 const App = () => {
-  const [users, setUsers] = React.useState([]);
-
-  React.useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const result = await getAllUsers();
-        setUsers(result);
-      } catch (error) {
-        console.error('Error fetching users:', error);
-      }
-    };
-
-    fetchUsers();
-  }, []);
+  const { data, loading, error, refetch } = useFetch("admin/getUsers/user");
+  console.log(data, "user data");
 
   return (
     <div>
-      <UserTable data={users} />
+      <UserTable data={data} loading={loading} />
     </div>
   );
 };

@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
-import { login } from "../store/authSlice";
+import { loginUser } from "../store/authSlice"; // Adjust import based on your file structure
 import { useNavigate } from "react-router-dom";
 import { Logo } from "../assets";
 
 const Login = () => {
   const [error, setError] = useState("");
+  const [isSigning, setIsSigning] = useState(false);
   const {
     register,
     handleSubmit,
@@ -15,14 +16,28 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     setError("");
-    // Dummy check for demonstration; replace this with actual validation logic
-    if (data.username === "admin@admin.com" && data.password === "pass@123") {
-      dispatch(login({ userData: { username: data.username } }));
+    setIsSigning(true); // Set signing state to true
+    // console.log(data, "data");
+    try {
+      // Dispatch login action and unwrap the promise
+      const loginResponse = await dispatch(loginUser(data)).unwrap();
+      // console.log("Login Response:", loginResponse);
+      // Handle success, navigate to home or another route
       navigate("/");
-    } else {
-      setError("Invalid credentails");
+    } catch (error) {
+      console.error("Login failed:", error);
+      // Handle specific errors and set error messages accordingly
+      if (error.code === "auth/wrong-password") {
+        setError("Password is wrong");
+      } else if (error.code === "auth/user-not-found") {
+        setError("User does not exist");
+      } else {
+        setError("Login failed. Please try again."); // Generic error message
+      }
+    } finally {
+      setIsSigning(false); // Reset signing state
     }
   };
 
@@ -35,8 +50,12 @@ const Login = () => {
         <div className="text-start">
           <span className="font-semibold">For demo</span>
           <span className="w-full flex items-center justify-start">
-            <p className="m-0 text-sm"><b>Email:</b> admin@admin.com</p>
-            <p className="ml-2 mb-0 text-sm"><b>Password:</b> pass@123</p>
+            <p className="m-0 text-sm">
+              <b>Email:</b> admin@yopmail.com
+            </p>
+            <p className="ml-2 mb-0 text-sm">
+              <b>Password:</b> Admin$123
+            </p>
           </span>
         </div>
         <p className="text-red-500 text-sm my-2">{error}</p>
@@ -46,8 +65,8 @@ const Login = () => {
               Username:
             </label>
             <input
-              type="text"
-              {...register("username", {
+              type="email"
+              {...register("email", {
                 required: "Username is required",
                 pattern: {
                   value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
@@ -94,8 +113,9 @@ const Login = () => {
           <button
             type="submit"
             className="w-full bg-admin_primary text-white p-3 rounded-md hover:bg-admin_dark focus:outline-none focus:ring-2 focus:ring-admin_light_grey"
+            disabled={isSigning} // Disable button when signing in
           >
-            Login
+            {isSigning ? "Signing in..." : "Login"}
           </button>
         </form>
       </div>

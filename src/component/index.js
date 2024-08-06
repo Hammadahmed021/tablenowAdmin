@@ -13,4 +13,6 @@ export { default as UserTable } from "./UserTable";
 export { default as BookingTable } from "./BookingTable";
 export { default as Amenities } from "./Amenities";
 export {default as TextEditor} from './RTE';
+export {default as Loader} from './Loader';
+export {default as Tooltip} from './Tooltip';
 

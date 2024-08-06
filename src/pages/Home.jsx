@@ -9,11 +9,8 @@ const Home = () => {
   const [salesData, setSalesData] = useState({ categories: [], values: [] });
   const [donutData, setDonutData] = useState([]);
 
-  const { data, loading, error } = useFetch("filter");
-
-  // if (loading) return <p className="text-center container mt-5">Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
-
+  const { data, loading, error, refetch } = useFetch("admin/getUsers/hotel");
+  console.log(data, "data");
 
   useEffect(() => {
     // Fetch data from API or calculate it dynamically
@@ -66,7 +63,11 @@ const Home = () => {
       </div>
       <div className="grid grid-cols-12 gap-4">
         <div className="col-span-12 mb-4">
-          <RestaurantTable data={data} isLoading={loading} />
+          <RestaurantTable
+            data={data}
+            isLoading={loading}
+            onActionCompleted={refetch}
+          />
         </div>
       </div>
     </>

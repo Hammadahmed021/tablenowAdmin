@@ -1,14 +1,43 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useCallback } from "react";
 import { useTable, useSortBy, usePagination } from "react-table";
 import { Link } from "react-router-dom";
 import { fallback } from "../assets";
-import { FaEye, FaBan } from "react-icons/fa";
-import Modal from "./Modal"; // Make sure to import the Modal component
+import { ApproveIcon, BlockIcon, UnblockIcon, ViewIcon } from "./IconComponent";
+import Modal from "./Modal";
+import Loader from "./Loader";
+import { approveHotel, toggleBlockUnblockHotel } from "../utils/Api";
+import { useSelector } from "react-redux";
+import classNames from "classnames";
+import { FaBan, FaCheck, FaClock } from "react-icons/fa";
 
-const RestaurantTable = ({ data = [], isLoading }) => {
+const RestaurantTable = ({ data = [], isLoading, onActionCompleted }) => {
   const [filterInput, setFilterInput] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [selectedId, setSelectedId] = useState(null);
+  const [actionType, setActionType] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
+  const token = useSelector((state) => state.auth.userData?.token);
+
+  const handleAction = useCallback(async () => {
+    setIsUpdating(true);
+    try {
+      if (actionType === "active") {
+        await approveHotel(selectedId, { is_approved: true }, token);
+      } else if (actionType === "block") {
+        await toggleBlockUnblockHotel(selectedId, { status: "block" }, token);
+      } else if (actionType === "unblock") {
+        await toggleBlockUnblockHotel(selectedId, { status: "active" }, token);
+      }
+
+      onActionCompleted();
+      setShowModal(false);
+    } catch (error) {
+      console.error(`Error in ${actionType}:`, error);
+      setShowModal(false);
+    } finally {
+      setIsUpdating(false);
+    }
+  }, [actionType, selectedId, token, onActionCompleted]);
 
   const filteredData = useMemo(() => {
     if (!Array.isArray(data)) return [];
@@ -21,11 +50,11 @@ const RestaurantTable = ({ data = [], isLoading }) => {
     () => [
       {
         Header: "Image",
-        accessor: "galleries",
+        accessor: "profile_image",
         Cell: ({ value }) => (
           <img
-            src={value && value.length > 0 ? value[0].image : fallback}
-            alt="Restaurant"
+            src={value || fallback}
+            alt="Profile"
             className="w-16 h-16 object-cover"
           />
         ),
@@ -43,51 +72,73 @@ const RestaurantTable = ({ data = [], isLoading }) => {
         ),
       },
       {
-        Header: "Cuisine",
-        accessor: "menu_types",
-        Cell: ({ value }) =>
-          value && value.length > 0
-            ? value.map((type) => type.name).join(", ")
-            : "No Cuisine",
+        Header: "Description",
+        accessor: "description",
+        Cell: ({ value }) => value || "No Description",
       },
       {
-        Header: "Facilities",
-        accessor: "facilities",
-        Cell: ({ value }) =>
-          value && value.length > 0
-            ? value.map((facility) => facility.name).join(", ")
-            : "No Facilities",
-      },
-      {
-        Header: "Location",
+        Header: "Address",
         accessor: "address",
         Cell: ({ value }) => value || "No Address",
       },
       {
+        Header: "Status",
+        accessor: "status",
+        Cell: ({ value }) => {
+          switch (value) {
+            case "active":
+              return <FaCheck className="text-green-500" />;
+            case "block":
+              return <FaBan className="text-red-500" />;
+            default:
+              return "Unknown";
+          }
+        },
+      },
+      {
         Header: "Actions",
-        Cell: ({ row }) => (
-          <div className="flex space-x-2">
-            <Link to={`/restaurants/${row.original.id}`}>
-              <FaEye className="text-blue-500 hover:text-blue-700" />
-            </Link>
-            <FaBan
-              className="text-red-500 hover:text-red-700 cursor-pointer"
-              onClick={() => {
-                setSelectedUserId(row.original.id);
-                setShowModal(true);
-              }}
-            />
-          </div>
-        ),
+        Cell: ({ row }) => {
+          const { status, id } = row.original;
+          const isApproved = status === "active";
+          const isBlocked = status === "block";
+
+          return (
+            <div className="flex space-x-2">
+              <ViewIcon onClick={() => {}} />
+              {!isApproved && (
+                <ApproveIcon
+                  onClick={() => {
+                    setSelectedId(id);
+                    setActionType("active");
+                    setShowModal(true);
+                  }}
+                />
+              )}
+              {isBlocked && (
+                <UnblockIcon
+                  onClick={() => {
+                    setSelectedId(id);
+                    setActionType("unblock");
+                    setShowModal(true);
+                  }}
+                />
+              )}
+              {isApproved && (
+                <BlockIcon
+                  onClick={() => {
+                    setSelectedId(id);
+                    setActionType("block");
+                    setShowModal(true);
+                  }}
+                />
+              )}
+            </div>
+          );
+        },
       },
     ],
     []
   );
-
-  const handleBlockUser = () => {
-    console.log(`Blocking user with ID: ${selectedUserId}`);
-    // Add your block user logic here
-  };
 
   const {
     getTableProps,
@@ -113,12 +164,12 @@ const RestaurantTable = ({ data = [], isLoading }) => {
     usePagination
   );
 
-  if (isLoading) {
-    return <p className="text-center">Loading...</p>;
+  if (isLoading || isUpdating) {
+    return <Loader />;
   }
 
   if (filteredData.length === 0) {
-    return <p>No restaurants found.</p>;
+    return <p>No data found.</p>;
   }
 
   return (
@@ -143,23 +194,13 @@ const RestaurantTable = ({ data = [], isLoading }) => {
         >
           <thead className="bg-gray-50">
             {headerGroups.map((headerGroup) => (
-              <tr key={headerGroup.id} {...headerGroup.getHeaderGroupProps()}>
+              <tr {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map((column) => (
                   <th
-                    key={column.id}
                     {...column.getHeaderProps(column.getSortByToggleProps())}
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    <div className="flex items-center">
-                      {column.render("Header")}
-                      <span>
-                        {column.isSorted
-                          ? column.isSortedDesc
-                            ? " 🔽"
-                            : " 🔼"
-                          : " 🔽"}
-                      </span>
-                    </div>
+                    {column.render("Header")}
                   </th>
                 ))}
               </tr>
@@ -172,16 +213,19 @@ const RestaurantTable = ({ data = [], isLoading }) => {
             {page.map((row) => {
               prepareRow(row);
               return (
-                <tr key={row.id} {...row.getRowProps()}>
+                <tr
+                  {...row.getRowProps()}
+                  className={classNames({
+                    "opacity-50 cursor-not-allowed":
+                      row.original.status === "block",
+                  })}
+                >
                   {row.cells.map((cell) => (
                     <td
-                      key={cell.column.id}
                       {...cell.getCellProps()}
                       className="px-6 py-4 whitespace-nowrap"
                     >
-                      <div className="flex items-center">
-                        {cell.render("Cell")}
-                      </div>
+                      {cell.render("Cell")}
                     </td>
                   ))}
                 </tr>
@@ -190,23 +234,40 @@ const RestaurantTable = ({ data = [], isLoading }) => {
           </tbody>
         </table>
       </div>
-      <div className="flex justify-between mt-4 items-center">
-        <div>
-          <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
+
+      <div className="flex items-center justify-between mt-4">
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => gotoPage(0)}
+            disabled={!canPreviousPage}
+            className="px-1 py-0 bg-admin_dark text-white rounded"
+          >
             {"<<"}
           </button>
-          <button onClick={() => previousPage()} disabled={!canPreviousPage}>
+          <button
+            onClick={() => previousPage()}
+            disabled={!canPreviousPage}
+            className="px-1 py-0 bg-admin_dark text-white rounded"
+          >
             {"<"}
           </button>
-          <span className="mx-2">
-            Page {pageIndex + 1} of {pageOptions.length}
+          <span>
+            Page{" "}
+            <strong>
+              {pageIndex + 1} of {pageOptions.length}
+            </strong>{" "}
           </span>
-          <button onClick={() => nextPage()} disabled={!canNextPage}>
+          <button
+            onClick={() => nextPage()}
+            disabled={!canNextPage}
+            className="px-1 py-0 bg-admin_dark text-white rounded"
+          >
             {">"}
           </button>
           <button
             onClick={() => gotoPage(pageOptions.length - 1)}
             disabled={!canNextPage}
+            className="px-1 py-0 bg-admin_dark text-white rounded"
           >
             {">>"}
           </button>
@@ -214,21 +275,35 @@ const RestaurantTable = ({ data = [], isLoading }) => {
         <select
           value={pageSize}
           onChange={(e) => setPageSize(Number(e.target.value))}
-          className="ml-2 p-1 border rounded"
+          className="p-2 border rounded"
         >
-          {[5, 10, 20, 30, 40, 50].map((pageSize) => (
-            <option key={pageSize} value={pageSize}>
-              Show {pageSize}
+          {[5, 10, 15, 20].map((size) => (
+            <option key={size} value={size}>
+              Show {size}
             </option>
           ))}
         </select>
       </div>
+
       {showModal && (
         <Modal
-          title="Are you sure you want to block this user?"
-          onYes={handleBlockUser}
+          show={showModal}
           onClose={() => setShowModal(false)}
-        />
+          onConfirm={handleAction}
+          title={`Confirm ${
+            actionType === "active" ? "Approval" : "Block/Unblock"
+          }`}
+        >
+          {isUpdating ? (
+            <Loader />
+          ) : (
+            <p>
+              Are you sure you want to{" "}
+              {actionType === "active" ? "approve" : "block/unblock"} this
+              hotel?
+            </p>
+          )}
+        </Modal>
       )}
     </div>
   );

@@ -1,67 +1,33 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { useTable, useSortBy, usePagination } from "react-table";
-import { FaTrash, FaSearch } from 'react-icons/fa'; // Import the delete and search icons
-import Modal from "./Modal"; // Adjust the path if needed
+import { Link } from "react-router-dom";
 
-const BookingTable = () => {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [selectedBookingId, setSelectedBookingId] = useState(null);
-  const [showModal, setShowModal] = useState(false);
+const BookingTable = ({ data = [], loading, error }) => {
   const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    // Replace this with your data fetching logic
-    const fetchData = async () => {
-      try {
-        // Example dummy data
-        const result = [
-          {
-            id: "1",
-            restaurantName: "The Gourmet Bistro",
-            menu: "Pizza, Pasta",
-            date: "2024-07-26",
-            time: "19:00",
-            price: "$50",
-          },
-          {
-            id: "2",
-            restaurantName: "Sushi Palace",
-            menu: "Sushi, Ramen",
-            date: "2024-07-27",
-            time: "20:00",
-            price: "$70",
-          },
-          // Add more bookings as needed
-        ];
-        setData(result);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
+  // Filter data based on search input
   const filteredData = useMemo(
-    () => data.filter(item => 
-      item.restaurantName.toLowerCase().includes(search.toLowerCase())
-    ),
+    () => data.filter(booking => {
+      const restaurantName = booking.hotel?.name || "";
+      const userName = booking.user?.name || "";
+      return (
+        restaurantName.toLowerCase().includes(search.toLowerCase()) ||
+        userName.toLowerCase().includes(search.toLowerCase())
+      );
+    }),
     [data, search]
   );
 
+  // Define table columns
   const columns = useMemo(
     () => [
       {
         Header: "Restaurant Name",
-        accessor: "restaurantName",
+        accessor: booking => booking.hotel?.name || "", // Adjusted for nested objects
       },
       {
-        Header: "Menu",
-        accessor: "menu",
+        Header: "User Name",
+        accessor: booking => booking.user?.name || "", // Adjusted for nested objects
       },
       {
         Header: "Date",
@@ -71,38 +37,31 @@ const BookingTable = () => {
         Header: "Time",
         accessor: "time",
       },
-      {
-        Header: "Price",
-        accessor: "price",
-      },
-      {
-        Header: "Actions",
-        accessor: "id",
-        Cell: ({ value }) => (
-          <div className="flex space-x-2">
-            <button
-              onClick={() => {
-                setSelectedBookingId(value);
-                setShowModal(true);
-              }}
-              className="text-red-500 hover:text-red-700"
-            >
-              <FaTrash />
-            </button>
-          </div>
-        ),
-      },
+      // Remove the following columns
+      // {
+      //   Header: "Menu",
+      //   accessor: "menu",
+      // },
+      // {
+      //   Header: "Price",
+      //   accessor: "price",
+      // },
+      // {
+      //   Header: "Actions",
+      //   accessor: "id",
+      //   Cell: ({ row }) => (
+      //     <div className="flex space-x-2">
+      //       <Link to={`/bookings/${row.original.id}`}>
+      //         <FaEye className="text-blue-500 hover:text-blue-700" />
+      //       </Link>
+      //     </div>
+      //   ),
+      // },
     ],
     []
   );
 
-  const handleDeleteBooking = () => {
-    console.log(`Deleting booking with ID: ${selectedBookingId}`);
-    // Implement the deletion logic here
-    setData(data.filter(booking => booking.id !== selectedBookingId));
-    setShowModal(false);
-  };
-
+  // Set up table instance
   const {
     getTableProps,
     getTableBodyProps,
@@ -127,12 +86,13 @@ const BookingTable = () => {
     usePagination
   );
 
+  // Handle loading and error states
   if (loading) return <p className="text-center">Loading...</p>;
   if (error) return <p className="text-center">Error: {error}</p>;
 
   return (
     <div className="w-full">
-      <div className="flex justify-between items-center mb-4">
+      <div className="mb-4 flex justify-between items-center">
         <h2 className="text-lg sm:text-lg font-bold text-admin_text_grey">
           Bookings
         </h2>
@@ -141,7 +101,7 @@ const BookingTable = () => {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by Restaurant Name"
+            placeholder="Search by Restaurant Name or User Name"
             className="p-2 border rounded w-auto"
           />
         </div>
@@ -159,12 +119,13 @@ const BookingTable = () => {
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     {column.render("Header")}
-                    <span>
+                    {/* Hide sorting icons */}
+                    <span className="invisible">
                       {column.isSorted
                         ? column.isSortedDesc
                           ? " 🔽"
                           : " 🔼"
-                        : " 🔽"}
+                        : ""}
                     </span>
                   </th>
                 ))}
@@ -187,29 +148,54 @@ const BookingTable = () => {
           </tbody>
         </table>
       </div>
-      <div className="flex justify-between mt-4 items-center">
-        <div>
-          <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>{"<<"}</button>
-          <button onClick={() => previousPage()} disabled={!canPreviousPage}>{"<"}</button>
-          <span className="mx-2">Page {pageIndex + 1} of {pageOptions.length}</span>
-          <button onClick={() => nextPage()} disabled={!canNextPage}>{">"}</button>
-          <button onClick={() => gotoPage(pageOptions.length - 1)} disabled={!canNextPage}>{">>"}</button>
+
+      <div className="flex items-center justify-between mt-4">
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => gotoPage(0)}
+            disabled={!canPreviousPage}
+            className="px-1 py-0 bg-admin_dark text-white rounded"
+          >
+            {"<<"}
+          </button>
+          <button
+            onClick={() => previousPage()}
+            disabled={!canPreviousPage}
+            className="px-1 py-0 bg-admin_dark text-white rounded"
+          >
+            {"<"}
+          </button>
+          <span>
+            Page{" "}
+            <strong>
+              {pageIndex + 1} of {pageOptions.length}
+            </strong>{" "}
+          </span>
+          <button
+            onClick={() => nextPage()}
+            disabled={!canNextPage}
+            className="px-1 py-0 bg-admin_dark text-white rounded"
+          >
+            {">"}
+          </button>
+          <button
+            onClick={() => gotoPage(pageOptions.length - 1)}
+            disabled={!canNextPage}
+            className="px-1 py-0 bg-admin_dark text-white rounded"
+          >
+            {">>"}
+          </button>
         </div>
-        <select value={pageSize} onChange={(e) => setPageSize(Number(e.target.value))} className="ml-2 p-1 border rounded">
-          {[5, 10, 20, 30, 40, 50].map(size => (
+        <select
+          value={pageSize}
+          onChange={(e) => setPageSize(Number(e.target.value))}
+          className="p-2 border rounded"
+        >
+          {[5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 99].map(size => (
             <option key={size} value={size}>Show {size}</option>
           ))}
         </select>
       </div>
-
-      {/* Custom Modal for confirming deletion */}
-      {showModal && (
-        <Modal
-          title="Confirm Deletion"
-          onYes={handleDeleteBooking}
-          onClose={() => setShowModal(false)}
-        />
-      )}
     </div>
   );
 };

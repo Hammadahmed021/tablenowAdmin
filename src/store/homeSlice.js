@@ -1,17 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { getListDetails } from "../utils/Api";
 
-const initialState = {
-  url: {},
-  loading: false,
-  error: null,
-};
-
 export const fetchApiData = createAsyncThunk(
-  "restaurant/fetchApiData",
-  async ({ url, params = {} }, { rejectWithValue }) => {
+  "home/fetchApiData",
+  async ({ url, params = {}, token }, { rejectWithValue }) => {
     try {
-      const data = await getListDetails(url, params);
+      const data = await getListDetails(url, params, token);
       return { url, data };
     } catch (error) {
       return rejectWithValue(error.message);
@@ -19,9 +13,13 @@ export const fetchApiData = createAsyncThunk(
   }
 );
 
-const HomeSlice = createSlice({
+const homeSlice = createSlice({
   name: "home",
-  initialState,
+  initialState: {
+    data: {}, // Correctly initialize data as an empty object
+    loading: false,
+    error: null,
+  },
   reducers: {},
   extraReducers: (builder) => {
     builder
@@ -30,7 +28,8 @@ const HomeSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchApiData.fulfilled, (state, action) => {
-        state.url[action.payload.url] = action.payload.data;
+        const { url, data } = action.payload;
+        state.data[url] = { data }; // Ensure data is stored correctly
         state.loading = false;
       })
       .addCase(fetchApiData.rejected, (state, action) => {
@@ -40,4 +39,4 @@ const HomeSlice = createSlice({
   },
 });
 
-export default HomeSlice.reducer;
+export default homeSlice.reducer;

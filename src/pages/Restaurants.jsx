@@ -1,19 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { RestaurantTable } from "../component";
-import axios from "axios";
 import useFetch from "../hooks/useFetch";
+// import RestaurantManagement from "../component/RestaurantManagement";
 
 const Restaurants = () => {
-  const { data, loading, error } = useFetch("filter");
+  // const [getData, setGetData] = useState(null);
+  const { data, loading, error, refetch } = useFetch("admin/getUsers/hotel");
 
-  // if (loading) return <p className="text-center container mt-5">Loading...</p>;
+  if (loading) return <p className="text-center">Loading...</p>;
   if (error) return <p>Error: {error}</p>;
-
+  if (!data || data.length === 0) return <p>No data found.</p>;
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-4 ">
-        <RestaurantTable data={data} isLoading={loading} />
+      <div className="grid grid-cols-1 gap-4">
+        <RestaurantTable
+          data={data}
+          isLoading={loading}
+          onActionCompleted={refetch}
+        />
       </div>
     </>
   );

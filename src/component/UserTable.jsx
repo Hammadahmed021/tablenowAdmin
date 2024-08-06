@@ -1,37 +1,13 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { useTable, useSortBy, usePagination } from "react-table";
-import { FaEye, FaBan } from "react-icons/fa";
+import { FaEye } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import Modal from "./Modal";
-import { getAllUsers } from "../utils/localDB";
 
-const UserTable = () => {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [selectedUserId, setSelectedUserId] = useState(null);
-  const [showModal, setShowModal] = useState(false);
+const UserTable = ({ data = [], loading, error }) => {
   const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const result = await getAllUsers();
-        setData(result);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
   const filteredData = useMemo(
-    () => data.filter(user =>
-      user.name.toLowerCase().includes(search.toLowerCase())
-    ),
+    () => data.filter(user => user.name.toLowerCase().includes(search.toLowerCase())),
     [data, search]
   );
 
@@ -57,26 +33,12 @@ const UserTable = () => {
             <Link to={`/users/${row.original.id}`}>
               <FaEye className="text-blue-500 hover:text-blue-700" />
             </Link>
-            <FaBan
-              className="text-red-500 hover:text-red-700 cursor-pointer"
-              onClick={() => {
-                setSelectedUserId(row.original.id);
-                setShowModal(true);
-              }}
-            />
           </div>
         ),
       },
     ],
     []
   );
-
-  const handleDeleteUser = () => {
-    console.log(`Deleting user with ID: ${selectedUserId}`);
-    // Implement the deletion logic here
-    setData(data.filter(user => user.id !== selectedUserId));
-    setShowModal(false);
-  };
 
   const {
     getTableProps,
@@ -139,7 +101,7 @@ const UserTable = () => {
                         ? column.isSortedDesc
                           ? " 🔽"
                           : " 🔼"
-                        : " 🔽"}
+                        : ""}
                     </span>
                   </th>
                 ))}
@@ -162,29 +124,56 @@ const UserTable = () => {
           </tbody>
         </table>
       </div>
-      <div className="flex justify-between mt-4 items-center">
-        <div>
-          <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>{"<<"}</button>
-          <button onClick={() => previousPage()} disabled={!canPreviousPage}>{"<"}</button>
-          <span className="mx-2">Page {pageIndex + 1} of {pageOptions.length}</span>
-          <button onClick={() => nextPage()} disabled={!canNextPage}>{">"}</button>
-          <button onClick={() => gotoPage(pageOptions.length - 1)} disabled={!canNextPage}>{">>"}</button>
+      <div className="flex items-center justify-between mt-4">
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => gotoPage(0)}
+            disabled={!canPreviousPage}
+            className="px-1 py-0 bg-admin_dark text-white rounded"
+          >
+            {"<<"}
+          </button>
+          <button
+            onClick={() => previousPage()}
+            disabled={!canPreviousPage}
+            className="px-1 py-0 bg-admin_dark text-white rounded"
+          >
+            {"<"}
+          </button>
+          <span>
+            Page{" "}
+            <strong>
+              {pageIndex + 1} of {pageOptions.length}
+            </strong>
+            {" "}
+          </span>
+          <button
+            onClick={() => nextPage()}
+            disabled={!canNextPage}
+            className="px-1 py-0 bg-admin_dark text-white rounded"
+          >
+            {">"}
+          </button>
+          <button
+            onClick={() => gotoPage(pageOptions.length - 1)}
+            disabled={!canNextPage}
+            className="px-1 py-0 bg-admin_dark text-white rounded"
+          >
+            {">>"}
+          </button>
+          
         </div>
-        <select value={pageSize} onChange={(e) => setPageSize(Number(e.target.value))} className="ml-2 p-1 border rounded">
-          {[5, 10, 20, 30, 40, 50].map(size => (
+        <select
+          value={pageSize}
+          onChange={(e) => setPageSize(Number(e.target.value))}
+          className="p-2 border rounded"
+        >
+          {[5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 99].map(size => (
             <option key={size} value={size}>Show {size}</option>
           ))}
         </select>
       </div>
-
-      {/* Custom Modal for confirming deletion */}
-      {showModal && (
-        <Modal
-          title="Confirm Deletion"
-          onYes={handleDeleteUser}
-          onClose={() => setShowModal(false)}
-        />
-      )}
+       
     </div>
   );
 };

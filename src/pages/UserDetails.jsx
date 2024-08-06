@@ -1,43 +1,57 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { getUserById } from '../utils/localDB';
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import useFetch from "../hooks/useFetch";
 
 const UserDetail = () => {
-  const { userId } = useParams();
+  const { id } = useParams(); // Get the user ID from the URL
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const { data, loading, error: fetchError } = useFetch("admin/getUsers/user");
+
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const userData = await getUserById(userId);
+    // Check if the data is already available
+    if (data && data.length) {
+      const userData = data.find((rest) => rest.id.toString() === id);
+
+      console.log(userData, "data user detail");
+
+      if (userData) {
         setUser(userData);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+        setIsLoading(false);
+      } else {
+        setError("User not found");
+        setIsLoading(false);
       }
-    };
+    } else if (!loading && fetchError) {
+      // If there's an error from useFetch
+      setError(fetchError);
+      setIsLoading(false);
+    }
+  }, [data, id, loading, fetchError]);
 
-    fetchUser();
-  }, [userId]);
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
+  if (error) {
+    return <div>{error}</div>;
+  }
 
   return (
-    <div>
-      <h2>User Details</h2>
-      {user && (
-        <div>
-          <p><strong>Name:</strong> {user.name}</p>
-          <p><strong>Email:</strong> {user.email}</p>
-          <p><strong>Phone:</strong> {user.phone}</p>
-          <p><strong>Address:</strong> {user.address}</p>
-          {/* Add other user fields as needed */}
-        </div>
-      )}
+    <div className="">
+      <h2 className="text-2xl font-bold mb-4">{user.name || "No Name"}</h2>
+      <p>
+        <strong>Email:</strong> {user.email || "No Email"}
+      </p>
+      <p>
+        <strong>Phone:</strong> {user.phone || "No Phone"}
+      </p>
+      <p>
+        <strong>Address:</strong> {user.address || "No Address"}
+      </p>
+      {/* Add more user fields as needed */}
     </div>
   );
 };

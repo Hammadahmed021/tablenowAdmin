@@ -1,39 +1,38 @@
-import React, { useEffect } from 'react';
+import React from "react";
 
-const Modal = ({ title, onYes, onClose }) => {
-  useEffect(() => {
-    const handleOutsideClick = (event) => {
-      if (event.target.id === 'modal-overlay') {
-        onClose();
-      }
-    };
-
-    window.addEventListener('click', handleOutsideClick);
-    return () => {
-      window.removeEventListener('click', handleOutsideClick);
-    };
-  }, [onClose]);
+const Modal = ({ show, onClose, onConfirm, title }) => {
+  if (!show) return null;
 
   return (
-    <div id="modal-overlay" className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-96 relative">
-        <button onClick={onClose} className="absolute top-2 right-2 text-gray-600 hover:text-gray-800">
-          &times;
-        </button>
-        <h2 className="text-xl font-semibold mb-4 text-center">{title}</h2>
-        <div className="flex justify-center space-x-4">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 w-full bg-admin_light_grey text-admin_text_grey rounded hover:bg-gray-300"
-          >
-            No
-          </button>
-          <button
-            onClick={() => { onYes(); onClose(); }}
-            className="px-4 py-2 w-full bg-admin_dark text-white rounded hover:bg-admin_primary"
-          >
-            Yes
-          </button>
+    <div className="fixed z-10 inset-0 overflow-y-auto">
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+          <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+
+        <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all max-w-lg w-full">
+          <div className="p-6">
+            <h3 className="text-lg leading-6 font-medium text-gray-900">{title}</h3>
+            <div className="mt-2">
+              <p className="text-sm text-gray-500">Are you sure you want to perform this action?</p>
+            </div>
+            <div className="mt-4 flex justify-end">
+              <button
+                type="button"
+                className="px-4 py-2 bg-gray-300 text-gray-900 rounded-md mr-2"
+                onClick={onClose}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="px-4 py-2 bg-admin_primary text-white rounded-md"
+                onClick={onConfirm}
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
