@@ -119,13 +119,12 @@ const BookingTable = ({ data = [], loading, error }) => {
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     {column.render("Header")}
-                    {/* Hide sorting icons */}
-                    <span className="invisible">
+                    <span>
                       {column.isSorted
                         ? column.isSortedDesc
                           ? " 🔽"
                           : " 🔼"
-                        : ""}
+                        : "🔽"}
                     </span>
                   </th>
                 ))}

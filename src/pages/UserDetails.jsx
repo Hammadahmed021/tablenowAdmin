@@ -41,7 +41,7 @@ const UserDetail = () => {
 
   return (
     <div className="">
-      <h2 className="text-2xl font-bold mb-4">{user.name || "No Name"}</h2>
+      <h2 className="text-3xl font-bold mb-4 capitalize">{user.name || "No Name"}</h2>
       <p>
         <strong>Email:</strong> {user.email || "No Email"}
       </p>

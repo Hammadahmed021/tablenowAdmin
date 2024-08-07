@@ -101,7 +101,7 @@ const UserTable = ({ data = [], loading, error }) => {
                         ? column.isSortedDesc
                           ? " 🔽"
                           : " 🔼"
-                        : ""}
+                        : "🔽"}
                     </span>
                   </th>
                 ))}

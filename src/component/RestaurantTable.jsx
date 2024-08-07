@@ -104,8 +104,14 @@ const RestaurantTable = ({ data = [], isLoading, onActionCompleted }) => {
 
           return (
             <div className="flex space-x-2">
-              <ViewIcon onClick={() => {}} />
-              {!isApproved && (
+              <Link
+                to={`/restaurants/${row.original.id}`}
+                className="text-blue-500 hover:underline"
+              >
+                {" "}
+                <ViewIcon />
+              </Link>
+              {!isApproved && !isBlocked && (
                 <ApproveIcon
                   onClick={() => {
                     setSelectedId(id);
@@ -123,7 +129,7 @@ const RestaurantTable = ({ data = [], isLoading, onActionCompleted }) => {
                   }}
                 />
               )}
-              {isApproved && (
+              {isApproved && !isBlocked && (
                 <BlockIcon
                   onClick={() => {
                     setSelectedId(id);
@@ -201,6 +207,13 @@ const RestaurantTable = ({ data = [], isLoading, onActionCompleted }) => {
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     {column.render("Header")}
+                    <span>
+                      {column.isSorted
+                        ? column.isSortedDesc
+                          ? " 🔽"
+                          : " 🔼"
+                        : "🔽"}
+                    </span>
                   </th>
                 ))}
               </tr>
@@ -277,7 +290,7 @@ const RestaurantTable = ({ data = [], isLoading, onActionCompleted }) => {
           onChange={(e) => setPageSize(Number(e.target.value))}
           className="p-2 border rounded"
         >
-          {[5, 10, 15, 20].map((size) => (
+          {[5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 99].map((size) => (
             <option key={size} value={size}>
               Show {size}
             </option>

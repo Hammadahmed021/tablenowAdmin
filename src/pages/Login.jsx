@@ -112,7 +112,9 @@ const Login = () => {
           </div>
           <button
             type="submit"
-            className="w-full bg-admin_primary text-white p-3 rounded-md hover:bg-admin_dark focus:outline-none focus:ring-2 focus:ring-admin_light_grey"
+            className={`w-full bg-admin_primary text-white p-3 rounded-md hover:bg-admin_dark focus:outline-none focus:ring-2 focus:ring-admin_light_grey ${
+              isSigning ? "opacity-75 cursor-not-allowed" : ""
+            }`}
             disabled={isSigning} // Disable button when signing in
           >
             {isSigning ? "Signing in..." : "Login"}
