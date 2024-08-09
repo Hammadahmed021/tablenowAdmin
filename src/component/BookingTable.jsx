@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { useTable, useSortBy, usePagination } from "react-table";
 import { Link } from "react-router-dom";
+import Loader from "./Loader";
 
 const BookingTable = ({ data = [], loading, error }) => {
   const [search, setSearch] = useState("");
@@ -27,7 +28,7 @@ const BookingTable = ({ data = [], loading, error }) => {
       },
       {
         Header: "User Name",
-        accessor: booking => booking.user?.name || "", // Adjusted for nested objects
+        accessor: booking => booking.user?.name || "Guest", // Adjusted for nested objects
       },
       {
         Header: "Date",
@@ -87,7 +88,7 @@ const BookingTable = ({ data = [], loading, error }) => {
   );
 
   // Handle loading and error states
-  if (loading) return <p className="text-center">Loading...</p>;
+  if (loading) return <p className="text-center"><Loader /></p>;
   if (error) return <p className="text-center">Error: {error}</p>;
 
   return (

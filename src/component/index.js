@@ -15,4 +15,5 @@ export { default as Amenities } from "./Amenities";
 export {default as TextEditor} from './RTE';
 export {default as Loader} from './Loader';
 export {default as Tooltip} from './Tooltip';
+export {default as Areas} from './Areas';
 

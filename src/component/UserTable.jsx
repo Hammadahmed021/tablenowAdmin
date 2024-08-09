@@ -2,13 +2,26 @@ import React, { useState, useMemo } from "react";
 import { useTable, useSortBy, usePagination } from "react-table";
 import { FaEye } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import Loader from "./Loader";
 
 const UserTable = ({ data = [], loading, error }) => {
   const [search, setSearch] = useState("");
 
+  const processedData = useMemo(() => {
+    return data.map((user) => ({
+      ...user,
+      name: user.name || "Guest",
+      email: user.email || "N/A",
+      phone: user.phone || "N/A",
+    }));
+  }, [data]);
+
   const filteredData = useMemo(
-    () => data.filter(user => user.name.toLowerCase().includes(search.toLowerCase())),
-    [data, search]
+    () =>
+      processedData.filter((user) =>
+        user.name.toLowerCase().includes(search.toLowerCase())
+      ),
+    [processedData, search]
   );
 
   const columns = useMemo(
@@ -64,7 +77,12 @@ const UserTable = ({ data = [], loading, error }) => {
     usePagination
   );
 
-  if (loading) return <p className="text-center">Loading...</p>;
+  if (loading)
+    return (
+      <p className="text-center">
+        <Loader />
+      </p>
+    );
   if (error) return <p className="text-center">Error: {error}</p>;
 
   return (
@@ -83,13 +101,16 @@ const UserTable = ({ data = [], loading, error }) => {
           />
         </div>
       </div>
-      
+
       <div className="overflow-x-auto shadow-md rounded-lg">
-        <table {...getTableProps()} className="min-w-full divide-y divide-gray-200">
+        <table
+          {...getTableProps()}
+          className="min-w-full divide-y divide-gray-200"
+        >
           <thead className="bg-gray-50">
-            {headerGroups.map(headerGroup => (
+            {headerGroups.map((headerGroup) => (
               <tr key={headerGroup.id} {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map(column => (
+                {headerGroup.headers.map((column) => (
                   <th
                     key={column.id}
                     {...column.getHeaderProps(column.getSortByToggleProps())}
@@ -108,13 +129,20 @@ const UserTable = ({ data = [], loading, error }) => {
               </tr>
             ))}
           </thead>
-          <tbody {...getTableBodyProps()} className="bg-white divide-y divide-gray-200">
-            {page.map(row => {
+          <tbody
+            {...getTableBodyProps()}
+            className="bg-white divide-y divide-gray-200"
+          >
+            {page.map((row) => {
               prepareRow(row);
               return (
                 <tr key={row.id} {...row.getRowProps()}>
-                  {row.cells.map(cell => (
-                    <td key={cell.column.id} {...cell.getCellProps()} className="px-6 py-4 whitespace-nowrap">
+                  {row.cells.map((cell) => (
+                    <td
+                      key={cell.column.id}
+                      {...cell.getCellProps()}
+                      className="px-6 py-4 whitespace-nowrap"
+                    >
                       {cell.render("Cell")}
                     </td>
                   ))}
@@ -144,8 +172,7 @@ const UserTable = ({ data = [], loading, error }) => {
             Page{" "}
             <strong>
               {pageIndex + 1} of {pageOptions.length}
-            </strong>
-            {" "}
+            </strong>{" "}
           </span>
           <button
             onClick={() => nextPage()}
@@ -161,19 +188,19 @@ const UserTable = ({ data = [], loading, error }) => {
           >
             {">>"}
           </button>
-          
         </div>
         <select
           value={pageSize}
           onChange={(e) => setPageSize(Number(e.target.value))}
           className="p-2 border rounded"
         >
-          {[5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 99].map(size => (
-            <option key={size} value={size}>Show {size}</option>
+          {[5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 99].map((size) => (
+            <option key={size} value={size}>
+              Show {size}
+            </option>
           ))}
         </select>
       </div>
-       
     </div>
   );
 };

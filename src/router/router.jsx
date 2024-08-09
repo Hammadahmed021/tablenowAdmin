@@ -1,92 +1,47 @@
 import React from "react";
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import App from "../App";
-import { Facilities, Home, Login, Restaurants, User, RestaurantDetail, AddTerms, Bookings, UserDetails } from "../pages";
+import {
+  Facilities,
+  Home,
+  Login,
+  Restaurants,
+  User,
+  RestaurantDetail,
+  AddTerms,
+  Bookings,
+  UserDetails,
+  Areas
+} from "../pages";
 import { AuthLayout } from "../component";
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Navigate to="/login" replace />, // Default redirect to login
-  },
-  {
-    path: "/",
-    element: <App />,
-    children: [
-      {
-        path: "dashboard",
-        element: (
-          <AuthLayout authentication={false}>
-            <Home />
-          </AuthLayout>
-        ),
-      },
-      {
-        path: "users",
-        element: (
-          <AuthLayout authentication={false}>
-            <User />
-          </AuthLayout>
-        ),
-      },
-      {
-        path: "users/:id",
-        element: (
-          <AuthLayout authentication={false}>
-            <UserDetails />
-          </AuthLayout>
-        ),
-      },
-      {
-        path: "restaurants",
-        element: (
-          <AuthLayout authentication={false}>
-            <Restaurants />
-          </AuthLayout>
-        ),
-      },
-      {
-        path: "restaurants/:id", // Route for restaurant details
-        element: (
-          <AuthLayout authentication={false}>
-            <RestaurantDetail />
-          </AuthLayout>
-        ),
-      },
-      {
-        path: "facilities",
-        element: (
-          <AuthLayout authentication={false}>
-            <Facilities />
-          </AuthLayout>
-        ),
-      },
-      {
-        path: "addterms",
-        element: (
-          <AuthLayout authentication={false}>
-            <AddTerms />
-          </AuthLayout>
-        ),
-      },
-      {
-        path: "bookings",
-        element: (
-          <AuthLayout authentication={false}>
-            <Bookings />
-          </AuthLayout>
-        ),
-      },
-    ],
-  },
-  {
-    path: "/login",
-    element: (
-      <AuthLayout authentication={true}>
-        <Login />
-      </AuthLayout>
-    ),
-  },
-]);
+// Determine base path based on environment
+const baseURL = import.meta.env.MODE === 'production'
+  ? import.meta.env.VITE_BASE_URL_PRODUCTION
+  : import.meta.env.VITE_BASE_URL_LOCAL;
 
-export default router;
+function BaseRouter() {
+  return (
+    <BrowserRouter basename={baseURL}>
+      <Routes>
+        <Route path="/" element={<App />}>
+          {/* Redirect to login if accessing root */}
+          <Route index element={<Navigate to="/login" replace />} />
+          <Route path="dashboard" element={<AuthLayout authentication={false}><Home /></AuthLayout>} />
+          <Route path="users" element={<AuthLayout authentication={false}><User /></AuthLayout>} />
+          <Route path="users/:id" element={<AuthLayout authentication={false}><UserDetails /></AuthLayout>} />
+          <Route path="restaurants" element={<AuthLayout authentication={false}><Restaurants /></AuthLayout>} />
+          <Route path="restaurants/:id" element={<AuthLayout authentication={false}><RestaurantDetail /></AuthLayout>} />
+          <Route path="facilities" element={<AuthLayout authentication={false}><Facilities /></AuthLayout>} />
+          <Route path="areas" element={<AuthLayout authentication={false}><Areas /></AuthLayout>} />
+          <Route path="addterms" element={<AuthLayout authentication={false}><AddTerms /></AuthLayout>} />
+          <Route path="bookings" element={<AuthLayout authentication={false}><Bookings /></AuthLayout>} />
+          {/* Authentication required routes */}
+          <Route path="login" element={<AuthLayout authentication={true}><Login /></AuthLayout>} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default BaseRouter;

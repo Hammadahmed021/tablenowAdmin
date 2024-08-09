@@ -28,7 +28,6 @@ const RestaurantTable = ({ data = [], isLoading, onActionCompleted }) => {
       } else if (actionType === "unblock") {
         await toggleBlockUnblockHotel(selectedId, { status: "active" }, token);
       }
-
       onActionCompleted();
       setShowModal(false);
     } catch (error) {

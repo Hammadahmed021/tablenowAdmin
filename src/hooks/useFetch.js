@@ -4,10 +4,22 @@ import { fetchApiData } from "../store/homeSlice";
 
 const useFetch = (url, params = {}) => {
   const dispatch = useDispatch();
+  
   const token = useSelector((state) => state.auth.userData?.token);
 
   // Corrected the state access to use the correct data structure
-  const data = useSelector((state) => state.home.data[url]?.data || []);
+  const data = useSelector((state) => {
+    console.log('Full Redux State:', state); // Log the entire state to see its structure
+    console.log('Home State:', state.home); // Log the home slice of the state
+    const homeData = state.home?.data || {}; // Safely access home.data
+    console.log('Home Data:', homeData); // Log homeData
+    const urlData = homeData[url]?.data; // Access data based on the URL
+    console.log('URL Data:', urlData); // Log URL-specific data
+    
+    return urlData || []; // Return the data or an empty array
+  });
+  
+  
   const loading = useSelector((state) => state.home.loading);
   const error = useSelector((state) => state.home.error);
 

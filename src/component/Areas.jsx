@@ -9,7 +9,7 @@ import {
   FaAccessibleIcon,
   FaArrowRight,
 } from "react-icons/fa";
-import useFacilities from "../hooks/useFacilities";
+import useAreas from "../hooks/useAreas";
 import Loader from "./Loader";
 
 // Icons for different amenities
@@ -24,48 +24,48 @@ const amenityIcons = {
   // Add more mappings here
 };
 
-const Amenities = () => {
+const Areas = () => {
   const {
-    facilities,
+    areas,
     loading,
     error,
-    addNewFacility,
-    updateExistingFacility,
-    deleteExistingFacility,
-    refetchFacilities,
-  } = useFacilities();
+    addNewarea,
+    updateExistingArea,
+    deleteExistingArea,
+    refetchareas,
+  } = useAreas();
 
-  const [selectedFacility, setSelectedFacility] = useState(null);
-  const [facilityName, setFacilityName] = useState("");
+  const [selectedarea, setSelectedarea] = useState(null);
+  const [areaName, setareaName] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleEditFacility = (facility) => {
-    setSelectedFacility(facility);
-    setFacilityName(facility.name);
+  const handleEditarea = (area) => {
+    setSelectedarea(area);
+    setareaName(area.name);
   };
 
-  const handleAddOrUpdateFacility = async () => {
+  const handleAddOrUpdatearea = async () => {
     if (isProcessing) return; // Prevent further action while processing
 
     setIsProcessing(true);
 
     try {
-      if (selectedFacility) {
-        // Update existing facility
-        await updateExistingFacility(selectedFacility.id, { name: facilityName.trim() });
-        setSelectedFacility(null);
-      } else if (facilityName.trim()) {
-        // Add new facility
-        await addNewFacility({ name: facilityName.trim() });
+      if (selectedarea) {
+        // Update existing area
+        await updateExistingArea(selectedarea.id, { name: areaName.trim() });
+        setSelectedarea(null);
+      } else if (areaName.trim()) {
+        // Add new area
+        await addNewarea({ name: areaName.trim() });
       }
-      setFacilityName("");
-      // Refetch facilities after successful add/update
-      await refetchFacilities();
+      setareaName("");
+      // Refetch areas after successful add/update
+      await refetchareas();
     } catch (err) {
       console.error(
-        selectedFacility
-          ? "Error updating facility:"
-          : "Error adding facility:",
+        selectedarea
+          ? "Error updating area:"
+          : "Error adding area:",
         err
       );
     } finally {
@@ -73,15 +73,15 @@ const Amenities = () => {
     }
   };
 
-  const handleDeleteFacility = async (facilityId) => {
+  const handleDeletearea = async (areaId) => {
     if (isProcessing) return; // Prevent further action while processing
 
     try {
-      await deleteExistingFacility(facilityId);
-      // Refetch facilities after successful delete
-      await refetchFacilities();
+      await deleteExistingArea(areaId);
+      // Refetch areas after successful delete
+      await refetchareas();
     } catch (err) {
-      console.error("Error deleting facility:", err);
+      console.error("Error deleting area:", err);
     }
   };
 
@@ -91,26 +91,26 @@ const Amenities = () => {
   return (
     <div>
       <h2 className="text-lg sm:text-lg font-bold text-admin_text_grey mb-4">
-        Restaurant Facilities
+        Restaurant areas
       </h2>
 
       <div className="mb-4">
         <label
-          htmlFor="facility-name"
+          htmlFor="area-name"
           className="block text-lg font-semibold mb-2"
         >
-          Add/Update Facility
+          Add/Update area
         </label>
         <input
-          id="facility-name"
+          id="area-name"
           type="text"
-          value={facilityName}
-          onChange={(e) => setFacilityName(e.target.value)}
+          value={areaName}
+          onChange={(e) => setareaName(e.target.value)}
           className="p-2 border rounded w-full"
-          placeholder="Enter facility name"
+          placeholder="Enter area name"
         />
         <button
-          onClick={handleAddOrUpdateFacility}
+          onClick={handleAddOrUpdatearea}
           className={`p-2 mt-2 ${
             isProcessing
               ? "bg-gray-400 cursor-not-allowed"
@@ -120,30 +120,30 @@ const Amenities = () => {
         >
           {isProcessing
             ? "Processing..."
-            : selectedFacility
-            ? "Update Facility"
-            : "Add Facility"}
+            : selectedarea
+            ? "Update area"
+            : "Add area"}
         </button>
       </div>
 
       <div className="flex flex-wrap gap-4">
-        {facilities.map((facility) => (
+        {areas.map((area) => (
           <div
-            key={facility.id}
+            key={area.id}
             className="flex items-center space-x-2 bg-white border rounded-lg p-2 shadow-md"
           >
             <div className="text-lg">
-              {amenityIcons[facility.name] || <FaArrowRight />}
+              {amenityIcons[area.name] || <FaArrowRight />}
             </div>
-            <span>{facility.name}</span>
+            <span>{area.name}</span>
             <button
-              onClick={() => handleEditFacility(facility)}
+              onClick={() => handleEditarea(area)}
               className="text-blue-500 text-xs"
             >
               Edit
             </button>
             <button
-              onClick={() => handleDeleteFacility(facility.id)}
+              onClick={() => handleDeletearea(area.id)}
               className="text-red-500 text-xs"
             >
               Delete
@@ -155,4 +155,4 @@ const Amenities = () => {
   );
 };
 
-export default Amenities;
+export default Areas;

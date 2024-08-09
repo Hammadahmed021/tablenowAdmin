@@ -7,3 +7,4 @@ export { default as Facilities} from './Facilities';
 export { default as RestaurantDetail} from './RestaurantDetail';
 export { default as AddTerms} from './AddTerms';
 export { default as Bookings} from './Bookings';
+export { default as Areas } from './Area'

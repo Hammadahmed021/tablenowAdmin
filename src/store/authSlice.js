@@ -23,7 +23,9 @@ export const loginUser = createAsyncThunk(
         password
       );
       const user = userCredential.user;
-      const token = await getIdToken(user);
+      console.log(user, 'user');
+      
+      const adminToken = await getIdToken(user);
 
       // console.log("User Credential:", userCredential);
 
@@ -39,7 +41,7 @@ export const loginUser = createAsyncThunk(
         uid: user.uid,
         email: user.email,
         displayName: user.displayName,
-        token,
+        adminToken,
         ...response,
       };
     } catch (error) {
