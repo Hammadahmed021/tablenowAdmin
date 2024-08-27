@@ -1,37 +1,56 @@
 import React from "react";
-import { FaEye, FaBan, FaCheck, FaUndo } from "react-icons/fa";
+import {
+  FaCheck,
+  FaBan,
+  FaUndo,
+  FaRegEye,
+} from "react-icons/fa";
 import Tooltip from "./Tooltip"; // Import the Tooltip component
+
+const iconBaseStyles =
+  "cursor-pointer transition-transform duration-200 ease-in-out transform hover:scale-110 p-2 rounded-full";
 
 const ApproveIcon = ({ onClick }) => (
   <Tooltip text="Approve">
-    <FaCheck
-      className="text-green-500 hover:text-green-700 cursor-pointer"
+    <div
+      className={`bg-green-100 hover:bg-green-200 text-green-600 ${iconBaseStyles} shadow-md`}
       onClick={onClick}
-    />
+    >
+      <FaCheck size={14} />
+    </div>
   </Tooltip>
 );
 
 const BlockIcon = ({ onClick }) => (
   <Tooltip text="Block">
-    <FaBan
-      className="text-red-500 hover:text-red-700 cursor-pointer"
+    <div
+      className={`bg-red-100 hover:bg-red-200 text-red-600 ${iconBaseStyles} shadow-md`}
       onClick={onClick}
-    />
+    >
+      <FaBan size={14} />
+    </div>
   </Tooltip>
 );
 
 const UnblockIcon = ({ onClick }) => (
   <Tooltip text="Unblock">
-    <FaUndo
-      className="text-yellow-500 hover:text-yellow-700 cursor-pointer"
+    <div
+      className={`bg-yellow-100 hover:bg-yellow-200 text-yellow-600 ${iconBaseStyles} shadow-md`}
       onClick={onClick}
-    />
+    >
+      <FaUndo size={14} />
+    </div>
   </Tooltip>
 );
 
 const ViewIcon = ({ onClick }) => (
   <Tooltip text="View Details">
-    <FaEye className="text-blue-500 hover:text-blue-700 cursor-pointer" onClick={onClick} />
+    <div
+      className={`bg-admin_light hover:bg-admin_light_grey text-admin_dark ${iconBaseStyles} shadow-md`}
+      onClick={onClick}
+    >
+      <FaRegEye size={14} />
+    </div>
   </Tooltip>
 );
 

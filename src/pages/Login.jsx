@@ -23,7 +23,10 @@ const Login = () => {
     try {
       // Dispatch login action and unwrap the promise
       const loginResponse = await dispatch(loginUser(data)).unwrap();
-      // console.log("Login Response:", loginResponse);
+      console.log("Login Response:", loginResponse);
+      const token = loginResponse?.token;
+        // Store token in localStorage
+        localStorage.setItem("adminToken", token);
       // Handle success, navigate to home or another route
       navigate("/");
     } catch (error) {

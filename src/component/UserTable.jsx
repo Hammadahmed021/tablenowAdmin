@@ -1,8 +1,9 @@
 import React, { useState, useMemo } from "react";
 import { useTable, useSortBy, usePagination } from "react-table";
-import { FaEye } from "react-icons/fa";
+import { FaEye, FaRegEye } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import Loader from "./Loader";
+import classNames from "classnames";
 
 const UserTable = ({ data = [], loading, error }) => {
   const [search, setSearch] = useState("");
@@ -43,8 +44,12 @@ const UserTable = ({ data = [], loading, error }) => {
         accessor: "id",
         Cell: ({ row }) => (
           <div className="flex space-x-2">
-            <Link to={`/users/${row.original.id}`}>
-              <FaEye className="text-blue-500 hover:text-blue-700" />
+            <Link
+              to={`/users/${row.original.id}`}
+              className="flex items-center space-x-1 text-base  bg-admin_primary text-white px-2 py-1 rounded-md no-underline cursor-pointer transition-transform duration-200 ease-in-out transform hover:scale-105"
+            >
+              <FaRegEye size={16} />
+              <span>View</span>
             </Link>
           </div>
         ),
@@ -86,8 +91,8 @@ const UserTable = ({ data = [], loading, error }) => {
   if (error) return <p className="text-center">Error: {error}</p>;
 
   return (
-    <div className="w-full">
-      <div className="mb-4 flex justify-between items-center">
+    <div className="w-full bg-white shadow-md rounded-lg">
+      <div className="flex items-center justify-between p-4 border-b">
         <h2 className="text-lg sm:text-lg font-bold text-admin_text_grey">
           Users
         </h2>
@@ -102,12 +107,12 @@ const UserTable = ({ data = [], loading, error }) => {
         </div>
       </div>
 
-      <div className="overflow-x-auto shadow-md rounded-lg">
+      <div className="overflow-x-auto">
         <table
           {...getTableProps()}
           className="min-w-full divide-y divide-gray-200"
         >
-          <thead className="bg-gray-50">
+          <thead className="bg-gray-200">
             {headerGroups.map((headerGroup) => (
               <tr key={headerGroup.id} {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map((column) => (
@@ -133,15 +138,23 @@ const UserTable = ({ data = [], loading, error }) => {
             {...getTableBodyProps()}
             className="bg-white divide-y divide-gray-200"
           >
-            {page.map((row) => {
+            {page.map((row, index) => {
               prepareRow(row);
               return (
-                <tr key={row.id} {...row.getRowProps()}>
+                <tr
+                  key={row.id}
+                  {...row.getRowProps()}
+                  className={classNames({
+                    "opacity-50 cursor-not-allowed":
+                      row.original.status === "block",
+                    "bg-gray-50": index % 2 === 0, // Apply stripe effect
+                  })}
+                >
                   {row.cells.map((cell) => (
                     <td
                       key={cell.column.id}
                       {...cell.getCellProps()}
-                      className="px-6 py-4 whitespace-nowrap"
+                      className="px-6 py-4 whitespace-nowrap text-base text-gray-700"
                     >
                       {cell.render("Cell")}
                     </td>
@@ -152,7 +165,7 @@ const UserTable = ({ data = [], loading, error }) => {
           </tbody>
         </table>
       </div>
-      <div className="flex items-center justify-between mt-4">
+      <div className="flex items-center justify-between p-4 border-t">
         <div className="flex items-center space-x-2">
           <button
             onClick={() => gotoPage(0)}
@@ -192,7 +205,7 @@ const UserTable = ({ data = [], loading, error }) => {
         <select
           value={pageSize}
           onChange={(e) => setPageSize(Number(e.target.value))}
-          className="p-2 border rounded"
+          className="border border-gray-300 rounded p-1"
         >
           {[5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 99].map((size) => (
             <option key={size} value={size}>

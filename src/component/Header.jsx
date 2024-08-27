@@ -75,11 +75,11 @@ const Header = ({ toggleSidebar }) => {
             )}
           </div>
           <div className="flex space-between items-center">
-            <img
+            {/* <img
               src=""
               alt="admin"
               className="rounded-full w-10 h-10 bg-slate-300"
-            />
+            /> */}
             <h6 className="m-0 pl-2 text-sm">
               Hello, <strong>Admin</strong>
             </h6>

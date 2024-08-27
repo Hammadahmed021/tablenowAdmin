@@ -23,16 +23,18 @@ const FormComponent = () => {
 
   return (
     <div className="w-full">
-      <h2 className="text-lg sm:text-lg font-bold text-admin_text_grey mb-4">Add terms and policy here</h2>
+      <h2 className="text-lg sm:text-lg font-bold text-admin_text_grey mb-3 capitalize">
+        Add terms and policy here
+      </h2>
       <form onSubmit={handleSubmit(onSubmit)}>
         <TextEditor
-          label=""
+          label="Description"
           name="content"
           control={control}
           defaultValue=""
         />
 
-        <div className="mt-4">
+        <div className="mt-1">
           <button
             type="button"
             onClick={handleShowContent}
@@ -51,8 +53,14 @@ const FormComponent = () => {
 
       {showContent && (
         <div className="mt-10 border rounded-lg bg-gray-50">
-          <h3 className="text-lg font-semibold mb-2 px-2 py-2 bg-admin_dark text-white rounded-tr-lg rounded-tl-lg">Terms Content</h3>
-          <div className="px-2 py-2" dangerouslySetInnerHTML={{ __html: editorContent }} />
+          <h3 className="text-lg font-semibold mb-2 px-2 py-2 bg-admin_dark text-white rounded-tr-lg rounded-tl-lg">
+            Terms Content
+          </h3>
+          <div
+            className="px-2 py-2"
+            style={{ whiteSpace: "pre-wrap" }}
+            dangerouslySetInnerHTML={{ __html: editorContent }}
+          />
         </div>
       )}
     </div>

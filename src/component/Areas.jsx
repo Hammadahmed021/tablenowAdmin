@@ -63,9 +63,7 @@ const Areas = () => {
       await refetchareas();
     } catch (err) {
       console.error(
-        selectedarea
-          ? "Error updating area:"
-          : "Error adding area:",
+        selectedarea ? "Error updating area:" : "Error adding area:",
         err
       );
     } finally {
@@ -91,15 +89,12 @@ const Areas = () => {
   return (
     <div>
       <h2 className="text-lg sm:text-lg font-bold text-admin_text_grey mb-4">
-        Restaurant areas
+        Restaurant Areas
       </h2>
 
       <div className="mb-4">
-        <label
-          htmlFor="area-name"
-          className="block text-lg font-semibold mb-2"
-        >
-          Add/Update area
+        <label htmlFor="area-name" className="block text-lg font-semibold mb-2">
+          Add/Update Area
         </label>
         <input
           id="area-name"
@@ -121,8 +116,8 @@ const Areas = () => {
           {isProcessing
             ? "Processing..."
             : selectedarea
-            ? "Update area"
-            : "Add area"}
+            ? "Update Area"
+            : "Add Area"}
         </button>
       </div>
 

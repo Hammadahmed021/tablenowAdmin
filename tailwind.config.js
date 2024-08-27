@@ -18,11 +18,12 @@ export default {
       },
       colors:{
         admin_primary: '#FD027E',
-        admin_text_grey: '#717171',
+        admin_text_grey: '#464646',
         admin_light_grey: '#EDEDED',
         admin_dark: '#222222', 
         admin_light: '#F7F7F7',
-        admin_dark_field: '#1C1B1F',
+        admin_dark_field: '#1C1B1F', 
+        admin_red: '#FF0000', 
         admin_Bg: '#f6f9ff',
       },
       fontFamily:{

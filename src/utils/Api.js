@@ -4,7 +4,34 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 const API_KEY = import.meta.env.VITE_APP_KEY;
 // const token = 'RGV8JpfbC9J4vgwkKRZvooC3rQVXIuINJlB2CkF6QgEy9i1qMhTyxWjw5TRs'
 
-export const getListDetails = async (url, params, token) => {
+// utils/tokenUtils.js
+
+// Import environment variables
+const BASE_URL_LOCAL = import.meta.env.VITE_BASE_URL_LOCAL; // '/'
+const BASE_URL_PRODUCTION = import.meta.env.VITE_BASE_URL_PRODUCTION; // '/tablenow-admin/'
+
+// Function to get the appropriate token
+export const getToken = () => {
+  // Determine if running locally or in production
+  const isLocal = window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1');
+  
+  // Get the current pathname
+  const path = window.location.pathname;
+  
+  // Determine if the current path is for the admin panel
+  const isAdminPanel = isLocal
+    ? path.startsWith(BASE_URL_LOCAL)
+    : path.startsWith(BASE_URL_PRODUCTION);
+
+  // Return the appropriate token based on the path
+  return isAdminPanel
+    ? localStorage.getItem("adminToken")
+    : localStorage.getItem("webToken");
+};
+
+
+export const getListDetails = async (url, params) => {
+  const token = getToken();
   try {
     const response = await axios.get(`${BASE_URL}${url}`, {
       params: {
@@ -12,8 +39,8 @@ export const getListDetails = async (url, params, token) => {
         api_key: API_KEY,
       },
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
     });
     console.log("Full Response:", response.data); // Log the full response object
@@ -24,16 +51,15 @@ export const getListDetails = async (url, params, token) => {
   }
 };
 
-export const approveHotel = async (id, params, token) => {
-  console.log('Token:', token);
-  console.log('ID:', id);
+export const approveHotel = async (id, params) => {
+  const token = getToken();
 
   try {
     const response = await fetch(`${BASE_URL}admin/approveHotel/${id}`, {
-      method: 'PUT',
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         ...params,
@@ -43,30 +69,30 @@ export const approveHotel = async (id, params, token) => {
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorData.message}`);
+      throw new Error(
+        `HTTP error! Status: ${response.status}, Message: ${errorData.message}`
+      );
     }
 
     const data = await response.json();
-    console.log('ApproveHotel Response:', data);
+    console.log("ApproveHotel Response:", data);
 
     return data;
   } catch (error) {
-    console.error('Error approving hotel:', error.message);
+    console.error("Error approving hotel:", error.message);
     throw error;
   }
 };
 
-export const toggleBlockUnblockHotel = async (id, params, token) => {
-  console.log('Token:', token);
-  console.log('ID:', id);
-  console.log('Params:', params);
+export const toggleBlockUnblockHotel = async (id, params) => {
+  const token = getToken();
 
   try {
     const response = await fetch(`${BASE_URL}admin/blockUnblockHotel/${id}`, {
-      method: 'PUT',
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         ...params,
@@ -76,21 +102,22 @@ export const toggleBlockUnblockHotel = async (id, params, token) => {
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorData.message}`);
+      throw new Error(
+        `HTTP error! Status: ${response.status}, Message: ${errorData.message}`
+      );
     }
 
     const data = await response.json();
-    console.log('ToggleBlockUnblockHotel Response:', data);
+    console.log("ToggleBlockUnblockHotel Response:", data);
 
     return data;
   } catch (error) {
-    console.error('Error blocking/unblocking hotel:', error.message);
+    console.error("Error blocking/unblocking hotel:", error.message);
     throw error;
   }
 };
 
 export const Login = async (userData) => {
-  console.log(userData, "userData");
   try {
     const { email, fname, password } = userData;
     const payload = {
@@ -111,14 +138,15 @@ export const Login = async (userData) => {
   }
 };
 
-
 /* facilities */
-export const getFacilities = async (token) => {
+export const getFacilities = async () => {
+  const token = getToken();
+
   try {
     const response = await fetch(`${BASE_URL}facilities`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     if (!response.ok) {
@@ -126,18 +154,20 @@ export const getFacilities = async (token) => {
     }
     return await response.json();
   } catch (error) {
-    console.error('Error fetching facilities:', error.message);
+    console.error("Error fetching facilities:", error.message);
     throw error;
   }
 };
 
-export const addFacility = async (facility, token) => {
+export const addFacility = async (facility) => {
+  const token = getToken();
+
   try {
     const response = await fetch(`${BASE_URL}facilities`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(facility),
     });
@@ -146,18 +176,20 @@ export const addFacility = async (facility, token) => {
     }
     return await response.json();
   } catch (error) {
-    console.error('Error adding facility:', error.message);
+    console.error("Error adding facility:", error.message);
     throw error;
   }
 };
 
-export const updateFacility = async (id, facility, token) => {
+export const updateFacility = async (id, facility) => {
+  const token = getToken();
+
   try {
     const response = await fetch(`${BASE_URL}facilities/${id}`, {
-      method: 'PUT',
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(facility),
     });
@@ -166,17 +198,19 @@ export const updateFacility = async (id, facility, token) => {
     }
     return await response.json();
   } catch (error) {
-    console.error('Error updating facility:', error.message);
+    console.error("Error updating facility:", error.message);
     throw error;
   }
 };
 
-export const deleteFacility = async (id, token) => {
+export const deleteFacility = async (id) => {
+  const token = getToken();
+
   try {
     const response = await fetch(`${BASE_URL}facilities/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: {
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     if (!response.ok) {
@@ -184,20 +218,21 @@ export const deleteFacility = async (id, token) => {
     }
     return await response.json();
   } catch (error) {
-    console.error('Error deleting facility:', error.message);
+    console.error("Error deleting facility:", error.message);
     throw error;
   }
 };
 
+/* Areas */
 
-/* Areas */  
+export const getAreas = async () => {
+  const token = getToken();
 
-export const getAreas = async (token) => {
   try {
     const response = await fetch(`${BASE_URL}areas`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     if (!response.ok) {
@@ -205,18 +240,20 @@ export const getAreas = async (token) => {
     }
     return await response.json();
   } catch (error) {
-    console.error('Error fetching areas:', error.message);
+    console.error("Error fetching areas:", error.message);
     throw error;
   }
 };
 
-export const addArea = async (facility, token) => {
+export const addArea = async (facility) => {
+  const token = localStorage.getItem("adminToken");
+
   try {
     const response = await fetch(`${BASE_URL}areas`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(facility),
     });
@@ -225,18 +262,20 @@ export const addArea = async (facility, token) => {
     }
     return await response.json();
   } catch (error) {
-    console.error('Error adding areas:', error.message);
+    console.error("Error adding areas:", error.message);
     throw error;
   }
 };
 
-export const updateArea = async (id, facility, token) => {
+export const updateArea = async (id, facility) => {
+  const token = getToken();
+
   try {
     const response = await fetch(`${BASE_URL}areas/${id}`, {
-      method: 'PUT',
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(facility),
     });
@@ -245,17 +284,19 @@ export const updateArea = async (id, facility, token) => {
     }
     return await response.json();
   } catch (error) {
-    console.error('Error updating areas:', error.message);
+    console.error("Error updating areas:", error.message);
     throw error;
   }
 };
 
-export const deleteArea = async (id, token) => {
+export const deleteArea = async (id) => {
+  const token = getToken();
+
   try {
     const response = await fetch(`${BASE_URL}areas/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: {
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     if (!response.ok) {
@@ -263,7 +304,7 @@ export const deleteArea = async (id, token) => {
     }
     return await response.json();
   } catch (error) {
-    console.error('Error deleting areas:', error.message);
+    console.error("Error deleting areas:", error.message);
     throw error;
   }
 };
