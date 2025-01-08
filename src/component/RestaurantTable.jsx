@@ -5,10 +5,15 @@ import { fallback } from "../assets";
 import { ApproveIcon, BlockIcon, UnblockIcon, ViewIcon } from "./IconComponent";
 import Modal from "./Modal";
 import Loader from "./Loader";
-import { approveHotel, toggleBlockUnblockHotel } from "../utils/Api";
+import {
+  approveHotel,
+  toggleBlockUnblockHotel,
+  toggleFeaturedHotel,
+} from "../utils/Api";
 import { useSelector } from "react-redux";
 import classNames from "classnames";
 import { FaBan, FaCheck, FaClock } from "react-icons/fa";
+import { restrictWordCount } from "../utils/HelperFun";
 
 const RestaurantTable = ({ data = [], isLoading, onActionCompleted }) => {
   const [filterInput, setFilterInput] = useState("");
@@ -45,19 +50,34 @@ const RestaurantTable = ({ data = [], isLoading, onActionCompleted }) => {
     );
   }, [data, filterInput]);
 
+  const handleToggleFeatured = useCallback(
+    async (id, isFeatured) => {
+      try {
+        // Call the API to toggle the featured status
+        await toggleFeaturedHotel(id, { is_featured: !isFeatured });
+
+        // Notify that the action is completed
+        onActionCompleted();
+      } catch (error) {
+        console.error("Error toggling featured status:", error.message);
+      }
+    },
+    [onActionCompleted]
+  );
+
   const columns = useMemo(
     () => [
-      {
-        Header: "Image",
-        accessor: "profile_image",
-        Cell: ({ value }) => (
-          <img
-            src={value || fallback}
-            alt="Profile"
-            className="w-16 h-16 object-cover rounded-full"
-          />
-        ),
-      },
+      // {
+      //   Header: "Image",
+      //   accessor: "profile_image",
+      //   Cell: ({ value }) => (
+      //     <img
+      //       src={value || fallback}
+      //       alt="Profile"
+      //       className="w-10 h-10 object-cover rounded-full"
+      //     />
+      //   ),
+      // },
       {
         Header: "Name",
         accessor: "name",
@@ -73,8 +93,13 @@ const RestaurantTable = ({ data = [], isLoading, onActionCompleted }) => {
       {
         Header: "Description",
         accessor: "description",
-        Cell: ({ value }) => value || "No Description",
+        Cell: ({ value }) => (
+          <div className="w-[250px] text-balance overflow-y-scroll max-h-24">
+            {restrictWordCount(value || "No Description")}
+          </div>
+        ),
       },
+
       {
         Header: "Address",
         accessor: "address",
@@ -165,6 +190,41 @@ const RestaurantTable = ({ data = [], isLoading, onActionCompleted }) => {
           );
         },
       },
+      {
+        Header: "Featured",
+        accessor: "is_featured",
+        Cell: ({ row }) => {
+          const { id, is_featured } = row.original;
+
+          // Handle toggle switch change
+          const handleChange = () => {
+            handleToggleFeatured(id, is_featured);
+          };
+
+          return (
+            <div className="flex items-center">
+              <label className="inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={is_featured}
+                  onChange={handleChange}
+                  className="form-checkbox h-4 w-8 text-blue-500"
+                />
+                {/* <span className="ml-2 block w-10 h-5 bg-gray-200 rounded-full relative">
+                  <span
+                    className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-transform ${
+                      is_featured ? "transform translate-x-5" : ""
+                    }`}
+                  ></span>
+                </span> */}
+              </label>
+              <span className="mr-2 text-admin_text_grey">
+                {is_featured ? "Yes" : "No"}
+              </span>
+            </div>
+          );
+        },
+      },
     ],
     []
   );
@@ -187,7 +247,7 @@ const RestaurantTable = ({ data = [], isLoading, onActionCompleted }) => {
     {
       columns,
       data: filteredData,
-      initialState: { pageIndex: 0, pageSize: 5 },
+      initialState: { pageIndex: 0, pageSize: 10 },
     },
     useSortBy,
     usePagination
@@ -197,9 +257,9 @@ const RestaurantTable = ({ data = [], isLoading, onActionCompleted }) => {
     return <Loader />;
   }
 
-  if (filteredData.length === 0) {
-    return <p className="text-center text-gray-500">No data found.</p>;
-  }
+  // if (filteredData.length === 0) {
+  //   return <p className="text-center text-gray-500">No data found.</p>;
+  // }
 
   return (
     <div className="w-full bg-white shadow-md rounded-lg">
@@ -212,65 +272,68 @@ const RestaurantTable = ({ data = [], isLoading, onActionCompleted }) => {
           value={filterInput}
           onChange={(e) => setFilterInput(e.target.value || "")}
           placeholder="Search by name"
-          className="p-2 border rounded w-64"
+          className="p-2 border rounded w-auto"
         />
       </div>
-
-      <div className="overflow-x-auto">
-        <table
-          {...getTableProps()}
-          className="min-w-full divide-y divide-gray-200"
-        >
-          <thead className="bg-gray-200">
-            {headerGroups.map((headerGroup) => (
-              <tr {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map((column) => (
-                  <th
-                    {...column.getHeaderProps(column.getSortByToggleProps())}
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    {column.render("Header")}
-                    <span>
-                      {column.isSorted
-                        ? column.isSortedDesc
-                          ? " 🔽"
-                          : " 🔼"
-                        : " 🔽"}
-                    </span>
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody
-            {...getTableBodyProps()}
-            className="bg-white divide-y divide-gray-200"
+      {/* {filteredData.length === 0 ? (
+        <p className="text-center text-gray-500 pt-3">No data found.</p>
+      ) : ( */}
+        <div className="overflow-x-auto">
+          <table
+            {...getTableProps()}
+            className="min-w-full divide-y  divide-gray-200"
           >
-            {page.map((row, index) => {
-              prepareRow(row);
-              return (
-                <tr
-                  {...row.getRowProps()}
-                  className={classNames({
-                    "opacity-50 cursor-not-allowed":
-                      row.original.status === "block",
-                    "bg-gray-50": index % 2 === 0, // Apply stripe effect
-                  })}
-                >
-                  {row.cells.map((cell) => (
-                    <td
-                      {...cell.getCellProps()}
-                      className="px-6 py-4 whitespace-nowrap text-base text-gray-700"
+            <thead className="bg-gray-200">
+              {headerGroups.map((headerGroup) => (
+                <tr {...headerGroup.getHeaderGroupProps()}>
+                  {headerGroup.headers.map((column) => (
+                    <th
+                      {...column.getHeaderProps(column.getSortByToggleProps())}
+                      className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                     >
-                      {cell.render("Cell")}
-                    </td>
+                      {column.render("Header")}
+                      <span>
+                        {column.isSorted
+                          ? column.isSortedDesc
+                            ? " 🔽"
+                            : " 🔼"
+                          : " 🔽"}
+                      </span>
+                    </th>
                   ))}
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+              ))}
+            </thead>
+            <tbody
+              {...getTableBodyProps()}
+              className="bg-white divide-y divide-gray-200"
+            >
+              {page.map((row, index) => {
+                prepareRow(row);
+                return (
+                  <tr
+                    {...row.getRowProps()}
+                    className={classNames({
+                      "opacity-50 cursor-not-allowed":
+                        row.original.status === "block",
+                      "bg-gray-50": index % 2 === 0, // Apply stripe effect
+                    })}
+                  >
+                    {row.cells.map((cell) => (
+                      <td
+                        {...cell.getCellProps()}
+                        className="px-4 py-3 whitespace-nowrap text-base text-gray-700"
+                      >
+                        {cell.render("Cell")}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      
 
       <div className="flex items-center justify-between p-4 border-t">
         <div className="flex items-center space-x-2">

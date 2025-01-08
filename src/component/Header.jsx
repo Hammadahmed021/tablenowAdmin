@@ -42,7 +42,7 @@ const Header = ({ toggleSidebar }) => {
               onClick={toggleSidebar}
             />
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center hidden">
             
             <span
               className={`sm:ml-5 px-2 ml-0 py-1 w-48 sm:w-64 xl:w-64 2xl:w-96 border outline-none focus:bg-gray-50 bg-gray-50 text-black rounded-full duration-200  border-gray-200 flex` }

@@ -26,3 +26,8 @@ export const transformData = (apiResponse) => {
     menuTypes: item?.menuTypes || [],
   }));
 };
+
+
+export const restrictWordCount = (text, maxWords = 50) => {
+  return text.split(" ").slice(0, maxWords).join(" ") + (text.split(" ").length > maxWords ? "..." : "");
+};

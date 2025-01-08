@@ -48,10 +48,7 @@ const UserDetail = () => {
       <p>
         <strong>Phone:</strong> {user.phone || "No Phone"}
       </p>
-      <p>
-        <strong>Address:</strong> {user.address || "No Address"}
-      </p>
-      {/* Add more user fields as needed */}
+     
     </div>
   );
 };

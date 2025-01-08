@@ -4,13 +4,25 @@ import { CardComponent } from "../component";
 import { DonutChart, SalesChart } from "../component/Chart";
 import RestaurantTable from "../component/RestaurantTable";
 import useFetch from "../hooks/useFetch";
+import { getCardsData } from "../utils/Api";
 
 const Home = () => {
   const [salesData, setSalesData] = useState({ categories: [], values: [] });
   const [donutData, setDonutData] = useState([]);
+  const [cardData, setCardData] = useState([]);
 
   const { data, loading, error, refetch } = useFetch("admin/getUsers/hotel");
   console.log(data, "data");
+
+  const fetchCardsData = async () => {
+    try {
+      const response = await getCardsData();
+      // console.log(response, "response of cards");
+      setCardData(response);
+    } catch (error) {
+      throw new Error("Error fetchinga cards data", error);
+    }
+  };
 
   useEffect(() => {
     // Fetch data from API or calculate it dynamically
@@ -44,13 +56,14 @@ const Home = () => {
       { value: 484, name: "Sales" },
     ];
     setDonutData(fetchedDonutData);
+    fetchCardsData();
   }, []);
 
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {cards.map((card) => (
-          <CardComponent key={card.id} card={card} />
+        {Object.entries(cardData)?.map(([key, value]) => (
+          <CardComponent key={key} name={key} amount={value} />
         ))}
       </div>
       <div className="grid grid-cols-12 gap-4 my-4">
@@ -69,7 +82,6 @@ const Home = () => {
             onActionCompleted={refetch}
           />
         </div>
-        
       </div>
     </>
   );

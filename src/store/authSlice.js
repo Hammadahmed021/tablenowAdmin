@@ -35,8 +35,8 @@ export const loginUser = createAsyncThunk(
       };
 
       const response = await ApiLogin({ email, password });
-      console.log("API Login Response:", response);
-     localStorage.setItem("adminToken", response?.token);
+    //   console.log("API Login Response:", response);
+    //  localStorage.setItem("adminToken", response?.token);
 
 
       return {
@@ -69,8 +69,10 @@ const authSlice = createSlice({
       state.userData = null;
       state.loading = false;
       state.error = null;
-      localStorage.removeItem("adminToken");
-      
+      localStorage.removeItem("adminToken");      
+    },
+    loading: (state, action) => {
+      state.loading = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -91,6 +93,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { login, logout } = authSlice.actions;
+export const { login, logout, loading } = authSlice.actions;
 
 export default authSlice.reducer;

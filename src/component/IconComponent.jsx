@@ -13,7 +13,7 @@ const iconBaseStyles =
 const ApproveIcon = ({ onClick }) => (
   <Tooltip text="Approve">
     <div
-      className={`bg-green-100 hover:bg-green-200 text-green-600 ${iconBaseStyles} shadow-md`}
+      className={`bg-green-600 hover:bg-green-700 text-white ${iconBaseStyles} shadow-md`}
       onClick={onClick}
     >
       <FaCheck size={14} />
@@ -24,7 +24,7 @@ const ApproveIcon = ({ onClick }) => (
 const BlockIcon = ({ onClick }) => (
   <Tooltip text="Block">
     <div
-      className={`bg-red-100 hover:bg-red-200 text-red-600 ${iconBaseStyles} shadow-md`}
+      className={`bg-red-600 hover:bg-red-700 text-white ${iconBaseStyles} shadow-md`}
       onClick={onClick}
     >
       <FaBan size={14} />
@@ -35,7 +35,7 @@ const BlockIcon = ({ onClick }) => (
 const UnblockIcon = ({ onClick }) => (
   <Tooltip text="Unblock">
     <div
-      className={`bg-yellow-100 hover:bg-yellow-200 text-yellow-600 ${iconBaseStyles} shadow-md`}
+      className={`bg-yellow-600 hover:bg-yellow-700 text-white ${iconBaseStyles} shadow-md`}
       onClick={onClick}
     >
       <FaUndo size={14} />
@@ -46,7 +46,7 @@ const UnblockIcon = ({ onClick }) => (
 const ViewIcon = ({ onClick }) => (
   <Tooltip text="View Details">
     <div
-      className={`bg-admin_light hover:bg-admin_light_grey text-admin_dark ${iconBaseStyles} shadow-md`}
+      className={`bg-admin_dark hover:bg-admin_primary text-white ${iconBaseStyles} shadow-md`}
       onClick={onClick}
     >
       <FaRegEye size={14} />

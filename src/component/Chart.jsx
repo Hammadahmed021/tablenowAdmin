@@ -6,7 +6,7 @@ const titleStyle = {
   fontStyle: "normal",
   fontWeight: "bold",
   fontFamily: "Arial",
-  fontSize: 42,
+  fontSize: 32,
 };
 const SalesChart = ({ data }) => {
   const option = {

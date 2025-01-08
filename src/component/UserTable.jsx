@@ -76,7 +76,7 @@ const UserTable = ({ data = [], loading, error }) => {
     {
       columns,
       data: filteredData,
-      initialState: { pageIndex: 0, pageSize: 5 },
+      initialState: { pageIndex: 0, pageSize: 10 },
     },
     useSortBy,
     usePagination
@@ -101,7 +101,7 @@ const UserTable = ({ data = [], loading, error }) => {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by Name"
+            placeholder="Search by name"
             className="p-2 border rounded w-auto"
           />
         </div>
@@ -119,7 +119,7 @@ const UserTable = ({ data = [], loading, error }) => {
                   <th
                     key={column.id}
                     {...column.getHeaderProps(column.getSortByToggleProps())}
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     {column.render("Header")}
                     <span>
@@ -154,7 +154,7 @@ const UserTable = ({ data = [], loading, error }) => {
                     <td
                       key={cell.column.id}
                       {...cell.getCellProps()}
-                      className="px-6 py-4 whitespace-nowrap text-base text-gray-700"
+                      className="px-4 py-3 whitespace-nowrap text-base text-gray-700"
                     >
                       {cell.render("Cell")}
                     </td>

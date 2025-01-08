@@ -12,11 +12,8 @@ const Modal = ({ show, onClose, onConfirm, title }) => {
 
         <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all max-w-lg w-full">
           <div className="p-6">
-            <h3 className="text-lg leading-6 font-medium text-gray-900">{title}</h3>
-            <div className="mt-2">
-              <p className="text-sm text-gray-500">Are you sure you want to perform this action?</p>
-            </div>
-            <div className="mt-4 flex justify-end">
+            <h3 className="text-lg leading-6 font-medium text-gray-900 text-center">{title}</h3>
+            <div className="mt-4 flex justify-center">
               <button
                 type="button"
                 className="px-4 py-2 bg-gray-300 text-gray-900 rounded-md mr-2"

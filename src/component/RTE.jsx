@@ -2,7 +2,7 @@ import React from "react";
 import { Controller } from "react-hook-form";
 
 export default function TextEditor({
-  name,
+  name = "content",
   control,
   label,
   defaultValue = "",
@@ -12,25 +12,25 @@ export default function TextEditor({
       {/* {label && <label className="inline-block mb-1 pl-1">{label}</label>} */}
 
       <Controller
-        name={name || "content"}
+        name={name}
         control={control}
         defaultValue={defaultValue}
         render={({ field: { onChange, value } }) => (
-          <textarea
-            className="w-full h-64 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-100"
-            value={value}
-            onChange={onChange}
-            placeholder="Enter text here..."
-            style={{ whiteSpace: "pre-wrap" }} // Preserves line breaks
-          />
+          <>
+            <textarea
+              className="w-full h-64 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-100"
+              value={value}
+              onChange={onChange}
+              placeholder="Enter text here..."
+              style={{ whiteSpace: "pre-wrap" }} // Preserves line breaks
+            />
+           
+          </>
         )}
       />
     </div>
   );
 }
-
-
-
 
 // import React from "react";
 // import { Editor } from "@tinymce/tinymce-react";

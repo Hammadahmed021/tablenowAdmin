@@ -1,8 +1,8 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { FaAd, FaAddressBook, FaBlog, FaBook, FaBookmark, FaClipboard, FaCocktail, FaEnvelopeOpenText, FaHome, FaMap, FaPlus, FaTextHeight, FaTheaterMasks, FaUmbraco, FaUser, FaUtensils } from "react-icons/fa";
+import { FaAd, FaAddressBook, FaBlog, FaBook, FaBookmark, FaClipboard, FaCocktail, FaEnvelope, FaEnvelopeOpenText, FaHome, FaMap, FaPlus, FaTextHeight, FaTheaterMasks, FaUmbraco, FaUser, FaUtensils } from "react-icons/fa";
 import LogoutBtn from "./LogoutBtn";
-import { FaRegBookmark, FaTextSlash } from "react-icons/fa6";
+import { FaBowlFood, FaFaceSmileBeam, FaKitchenSet, FaRegBookmark, FaTextSlash } from "react-icons/fa6";
 
 const Sidebar = ({ isSidebarOpen }) => {
   return (
@@ -88,6 +88,45 @@ const Sidebar = ({ isSidebarOpen }) => {
         </li>
         <li className="mb-2">
           <NavLink
+            to="/kitchens"
+            className={({ isActive }) =>
+              `flex items-center px-2 py-2 rounded-md  ${isSidebarOpen ? "w-44" : "w-auto"} no-underline text-admin_text_grey  ${
+                isActive ? "bg-admin_primary text-white" : "hover:bg-admin_primary hover:text-white"
+              }`
+            }
+          >
+            <FaKitchenSet className={`${isSidebarOpen ? 'mr-4': 'mr-0'} `} size={20} />
+            {isSidebarOpen && <span>Kitchens</span>}
+          </NavLink>
+        </li>
+        <li className="mb-2">
+          <NavLink
+            to="/atmospheres"
+            className={({ isActive }) =>
+              `flex items-center px-2 py-2 rounded-md  ${isSidebarOpen ? "w-44" : "w-auto"} no-underline text-admin_text_grey  ${
+                isActive ? "bg-admin_primary text-white" : "hover:bg-admin_primary hover:text-white"
+              }`
+            }
+          >
+            <FaFaceSmileBeam className={`${isSidebarOpen ? 'mr-4': 'mr-0'} `} size={20} />
+            {isSidebarOpen && <span>Atmospheres</span>}
+          </NavLink>
+        </li>
+        <li className="mb-2">
+          <NavLink
+            to="/menus"
+            className={({ isActive }) =>
+              `flex items-center px-2 py-2 rounded-md  ${isSidebarOpen ? "w-44" : "w-auto"} no-underline text-admin_text_grey  ${
+                isActive ? "bg-admin_primary text-white" : "hover:bg-admin_primary hover:text-white"
+              }`
+            }
+          >
+            <FaBowlFood className={`${isSidebarOpen ? 'mr-4': 'mr-0'} `} size={20} />
+            {isSidebarOpen && <span>Menus</span>}
+          </NavLink>
+        </li>
+        <li className="mb-2">
+          <NavLink
             to="/addterms"
             className={({ isActive }) =>
               `flex items-center px-2 py-2 rounded-md  ${isSidebarOpen ? "w-44" : "w-auto"} no-underline text-admin_text_grey  ${
@@ -97,6 +136,19 @@ const Sidebar = ({ isSidebarOpen }) => {
           >
             <FaBookmark className={`${isSidebarOpen ? 'mr-4': 'mr-0'} `} size={20} />
             {isSidebarOpen && <span>Add Terms</span>}
+          </NavLink>
+        </li>
+        <li className="mb-2">
+          <NavLink
+            to="/newsletter"
+            className={({ isActive }) =>
+              `flex items-center px-2 py-2 rounded-md  ${isSidebarOpen ? "w-44" : "w-auto"} no-underline text-admin_text_grey  ${
+                isActive ? "bg-admin_primary text-white" : "hover:bg-admin_primary hover:text-white"
+              }`
+            }
+          >
+            <FaEnvelope className={`${isSidebarOpen ? 'mr-4': 'mr-0'} `} size={20} />
+            {isSidebarOpen && <span>Newsletter</span>}
           </NavLink>
         </li>
       </ul>

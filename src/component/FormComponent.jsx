@@ -3,7 +3,13 @@ import { useForm } from "react-hook-form";
 import TextEditor from "./RTE"; // Adjust the import path as necessary
 
 const FormComponent = () => {
-  const { control, handleSubmit, getValues } = useForm({
+  const {
+    control,
+    handleSubmit,
+    getValues,
+    formState: { errors },
+    setError,
+  } = useForm({
     defaultValues: {
       content: "",
     },
@@ -12,12 +18,24 @@ const FormComponent = () => {
   const [showContent, setShowContent] = useState(false);
   const [editorContent, setEditorContent] = useState("");
 
-  const onSubmit = (data) => {
-    console.log(data);
-  };
+  // Handle submit with validation
+  // const onSubmit = (data) => {
+  //   if (!data.content) {
+  //     // If content is empty, set error
+  //     setError("content", { type: "manual", message: "Content is required" });
+  //     return;
+  //   }
+  //   console.log(data); // Log data when valid
+  // };
 
+  // Show content only if validation passes
   const handleShowContent = () => {
-    setEditorContent(getValues("content"));
+    const contentValue = getValues("content");
+    if (!contentValue) {
+      setError("content", { type: "manual", message: "Content is required" });
+      return;
+    }
+    setEditorContent(contentValue);
     setShowContent(true);
   };
 
@@ -26,13 +44,17 @@ const FormComponent = () => {
       <h2 className="text-lg sm:text-lg font-bold text-admin_text_grey mb-3 capitalize">
         Add terms and policy here
       </h2>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form>
         <TextEditor
           label="Description"
           name="content"
           control={control}
           defaultValue=""
+          rules={{ required: "Content is required" }} // Required validation
         />
+        {errors.content && (
+          <p className="text-sm text-red-500">{errors.content.message}</p>
+        )}
 
         <div className="mt-1">
           <button
@@ -42,12 +64,6 @@ const FormComponent = () => {
           >
             Add Terms
           </button>
-          {/* <button
-            type="submit"
-            className="p-2 bg-admin_dark text-white rounded hover:bg-black"
-          >
-            Submit
-          </button> */}
         </div>
       </form>
 

@@ -9,7 +9,7 @@ import {
   FaAccessibleIcon,
   FaArrowRight,
 } from "react-icons/fa";
-import useFacilities from "../hooks/useFacilities";
+import useKitchens from "../hooks/useKitchens";
 import Loader from "./Loader";
 
 // Icons for different amenities
@@ -24,50 +24,46 @@ const amenityIcons = {
   // Add more mappings here
 };
 
-const Amenities = () => {
+const Kitchens = () => {
   const {
-    facilities,
+    kitchens,
     loading,
     error,
-    addNewFacility,
-    updateExistingFacility,
-    deleteExistingFacility,
-    refetchFacilities,
-  } = useFacilities();
+    addNewKitchen,
+    updateExistingKitchen,
+    deleteExistingKitchen,
+    refetchKitchens,
+  } = useKitchens();
 
-  const [selectedFacility, setSelectedFacility] = useState(null);
-  const [facilityName, setFacilityName] = useState("");
+  const [selectedKitchen, setSelectedKitchen] = useState(null);
+  const [kitchenName, setKitchenName] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleEditFacility = (facility) => {
-    setSelectedFacility(facility);
-    setFacilityName(facility.name);
+  const handleEditKitchen = (kitchen) => {
+    setSelectedKitchen(kitchen);
+    setKitchenName(kitchen.name);
   };
 
-  const handleAddOrUpdateFacility = async () => {
+  const handleAddOrUpdateKitchen = async () => {
     if (isProcessing) return; // Prevent further action while processing
 
     setIsProcessing(true);
 
     try {
-      if (selectedFacility) {
-        // Update existing facility
-        await updateExistingFacility(selectedFacility.id, {
-          name: facilityName.trim(),
-        });
-        setSelectedFacility(null);
-      } else if (facilityName.trim()) {
-        // Add new facility
-        await addNewFacility({ name: facilityName.trim() });
+      if (selectedKitchen) {
+        // Update existing kitchen
+        await updateExistingKitchen(selectedKitchen.id, { name: kitchenName.trim() });
+        setSelectedKitchen(null);
+      } else if (kitchenName.trim()) {
+        // Add new kitchen
+        await addNewKitchen({ name: kitchenName.trim() });
       }
-      setFacilityName("");
-      // Refetch facilities after successful add/update
-      await refetchFacilities();
+      setKitchenName("");
+      // Refetch kitchens after successful add/update
+      await refetchKitchens();
     } catch (err) {
       console.error(
-        selectedFacility
-          ? "Error updating facility:"
-          : "Error adding facility:",
+        selectedKitchen ? "Error updating kitchen:" : "Error adding kitchen:",
         err
       );
     } finally {
@@ -75,15 +71,15 @@ const Amenities = () => {
     }
   };
 
-  const handleDeleteFacility = async (facilityId) => {
+  const handleDeleteKitchen = async (kitchenId) => {
     if (isProcessing) return; // Prevent further action while processing
 
     try {
-      await deleteExistingFacility(facilityId);
-      // Refetch facilities after successful delete
-      await refetchFacilities();
+      await deleteExistingKitchen(kitchenId);
+      // Refetch kitchens after successful delete
+      await refetchKitchens();
     } catch (err) {
-      console.error("Error deleting facility:", err);
+      console.error("Error deleting kitchen:", err);
     }
   };
 
@@ -94,28 +90,28 @@ const Amenities = () => {
     <div>
       <div className="mb-4">
         <h2 className="text-lg sm:text-lg font-bold text-admin_text_grey mb-3 capitalize">
-          Add/Update Facility
+          Add/Update Kitchens
         </h2>
         <input
-          id="facility-name"
+          id="kitchen-name"
           type="text"
-          value={facilityName}
-          onChange={(e) => setFacilityName(e.target.value)}
+          value={kitchenName}
+          onChange={(e) => setKitchenName(e.target.value)}
           className="p-2 border rounded w-full"
-          placeholder="Enter facility name"
+          placeholder="Enter kitchen name"
         />
         <p className="text-red-500 text-sm">
-          {facilityName === "" && "Facility name is required."}
+          {kitchenName === "" && "Kitchen name is required."}
         </p>
         <button
-         onClick={() => {
-          if (!facilityName) {
-            alert("Facility name is required.");
-            return;
-          }
-          handleAddOrUpdateFacility();
-        }}
-          // onClick={handleAddOrUpdateFacility}
+          // onClick={handleAddOrUpdateKitchen}
+          onClick={() => {
+            if (!kitchenName) {
+              alert("Kitchen name is required.");
+              return;
+            }
+            handleAddOrUpdateKitchen();
+          }}
           className={`p-2 mt-2 ${
             isProcessing
               ? "bg-gray-400 cursor-not-allowed"
@@ -125,30 +121,30 @@ const Amenities = () => {
         >
           {isProcessing
             ? "Processing..."
-            : selectedFacility
-            ? "Update Facility"
-            : "Add Facility"}
+            : selectedKitchen
+            ? "Update Kitchen"
+            : "Add Kitchen"}
         </button>
       </div>
 
       <div className="flex flex-wrap gap-4">
-        {facilities.map((facility) => (
+        {kitchens.map((kitchen) => (
           <div
-            key={facility.id}
+            key={kitchen.id}
             className="flex items-center space-x-2 bg-white border rounded-lg p-2 shadow-md"
           >
             <div className="text-lg">
-              {amenityIcons[facility.name] || <FaArrowRight />}
+              {amenityIcons[kitchen.name] || <FaArrowRight />}
             </div>
-            <span>{facility.name}</span>
+            <span>{kitchen.name}</span>
             <button
-              onClick={() => handleEditFacility(facility)}
+              onClick={() => handleEditKitchen(kitchen)}
               className="text-blue-500 text-xs"
             >
               Edit
             </button>
             <button
-              onClick={() => handleDeleteFacility(facility.id)}
+              onClick={() => handleDeleteKitchen(kitchen.id)}
               className="text-red-500 text-xs"
             >
               Delete
@@ -160,4 +156,4 @@ const Amenities = () => {
   );
 };
 
-export default Amenities;
+export default Kitchens;

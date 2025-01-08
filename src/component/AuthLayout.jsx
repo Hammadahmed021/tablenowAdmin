@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import Loader from './Loader'
 
 export default function AuthLayout({ children, authentication = false}) {
   const navigate = useNavigate();
@@ -18,5 +19,5 @@ export default function AuthLayout({ children, authentication = false}) {
     setLoader(false);
   }, [authentication, authStatus, navigate]);
 
-  return loader ? <h2 className="text-center ">Loading...</h2> : <>{children}</>;
+  return loader ? <h2 className="text-center "><Loader /></h2> : <>{children}</>;
 }

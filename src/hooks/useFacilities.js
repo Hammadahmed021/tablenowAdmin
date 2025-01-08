@@ -11,7 +11,7 @@ const useFacilities = () => {
   const fetchFacilities = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await getFacilities(token);
+      const data = await getFacilities(); // No need to pass token
       console.log('Fetched facilities:', data); // Debugging
       setFacilities(data);
     } catch (error) {
@@ -20,7 +20,7 @@ const useFacilities = () => {
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     fetchFacilities();
@@ -29,7 +29,7 @@ const useFacilities = () => {
   const addNewFacility = async (facility) => {
     try {
       setLoading(true);
-      const newFacility = await addFacility(facility, token);
+      const newFacility = await addFacility(facility);
       console.log('New facility added:', newFacility); // Debugging
       setFacilities((prev) => [...prev, newFacility]);
     } catch (error) {
@@ -43,7 +43,7 @@ const useFacilities = () => {
   const updateExistingFacility = async (id, facility) => {
     try {
       setLoading(true);
-      const updatedFacility = await updateFacility(id, facility, token);
+      const updatedFacility = await updateFacility(id, facility);
       console.log('Facility updated:', updatedFacility); // Debugging
       setFacilities((prev) =>
         prev.map((f) => (f.id === id ? updatedFacility : f))
@@ -59,7 +59,7 @@ const useFacilities = () => {
   const deleteExistingFacility = async (id) => {
     try {
       setLoading(true);
-      await deleteFacility(id, token);
+      await deleteFacility(id);
       console.log('Facility deleted:', id); // Debugging
       setFacilities((prev) => prev.filter((f) => f.id !== id));
     } catch (error) {

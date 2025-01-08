@@ -6,21 +6,18 @@ const useAreas = () => {
   const [areas, setAreas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const token = useSelector((state) => state.auth.userData?.token);
 
   const fetchareas = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await getAreas(token);
-      console.log('Fetched areas:', data); // Debugging
+      const data = await getAreas();
       setAreas(data);
     } catch (error) {
-      console.error('Error fetching areas:', error); // Debugging
       setError(error);
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     fetchareas();
@@ -29,11 +26,9 @@ const useAreas = () => {
   const addNewArea = async (area) => {
     try {
       setLoading(true);
-      const newArea = await addArea(area, token);
-      console.log('New area added:', newArea); // Debugging
+      const newArea = await addArea(area);
       setAreas((prev) => [...prev, newArea]);
     } catch (error) {
-      console.error('Error adding area:', error); // Debugging
       setError(error);
     } finally {
       setLoading(false);
@@ -43,13 +38,11 @@ const useAreas = () => {
   const updateExistingArea = async (id, area) => {
     try {
       setLoading(true);
-      const updatedArea = await updateArea(id, area, token);
-      console.log('Area updated:', updatedArea); // Debugging
+      const updatedArea = await updateArea(id, area);
       setAreas((prev) =>
         prev.map((f) => (f.id === id ? updatedArea : f))
       );
     } catch (error) {
-      console.error('Error updating Area:', error); // Debugging
       setError(error);
     } finally {
       setLoading(false);
@@ -59,11 +52,9 @@ const useAreas = () => {
   const deleteExistingArea = async (id) => {
     try {
       setLoading(true);
-      await deleteArea(id, token);
-      console.log('Area deleted:', id); // Debugging
+      await deleteArea(id);
       setAreas((prev) => prev.filter((f) => f.id !== id));
     } catch (error) {
-      console.error('Error deleting Area:', error); // Debugging
       setError(error);
     } finally {
       setLoading(false);

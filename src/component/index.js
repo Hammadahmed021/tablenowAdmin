@@ -16,4 +16,7 @@ export {default as TextEditor} from './RTE';
 export {default as Loader} from './Loader';
 export {default as Tooltip} from './Tooltip';
 export {default as Areas} from './Areas';
+export {default as Kitchens} from './Kitchens';
+export {default as Atmospheres} from './Atmospheres';
+export {default as Menus} from './Menus';
 

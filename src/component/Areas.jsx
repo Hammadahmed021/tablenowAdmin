@@ -29,7 +29,7 @@ const Areas = () => {
     areas,
     loading,
     error,
-    addNewarea,
+    addNewArea,
     updateExistingArea,
     deleteExistingArea,
     refetchareas,
@@ -56,7 +56,7 @@ const Areas = () => {
         setSelectedarea(null);
       } else if (areaName.trim()) {
         // Add new area
-        await addNewarea({ name: areaName.trim() });
+        await addNewArea({ name: areaName.trim() });
       }
       setareaName("");
       // Refetch areas after successful add/update
@@ -70,6 +70,7 @@ const Areas = () => {
       setIsProcessing(false);
     }
   };
+ 
 
   const handleDeletearea = async (areaId) => {
     if (isProcessing) return; // Prevent further action while processing
@@ -88,14 +89,14 @@ const Areas = () => {
 
   return (
     <div>
-      <h2 className="text-lg sm:text-lg font-bold text-admin_text_grey mb-4">
+      {/* <h2 className="text-lg sm:text-lg font-bold text-admin_text_grey mb-4">
         Restaurant Areas
-      </h2>
+      </h2> */}
 
       <div className="mb-4">
-        <label htmlFor="area-name" className="block text-lg font-semibold mb-2">
+      <h2 className="text-lg sm:text-lg font-bold text-admin_text_grey mb-3 capitalize">
           Add/Update Area
-        </label>
+        </h2>
         <input
           id="area-name"
           type="text"
@@ -104,8 +105,18 @@ const Areas = () => {
           className="p-2 border rounded w-full"
           placeholder="Enter area name"
         />
+         <p className="text-red-500 text-sm">
+          {areaName === "" && "Area name is required."}
+        </p>
         <button
-          onClick={handleAddOrUpdatearea}
+          // onClick={handleAddOrUpdatearea}
+          onClick={() => {
+            if (!areaName) {
+              alert("Area name is required.");
+              return;
+            }
+            handleAddOrUpdatearea();
+          }}
           className={`p-2 mt-2 ${
             isProcessing
               ? "bg-gray-400 cursor-not-allowed"
